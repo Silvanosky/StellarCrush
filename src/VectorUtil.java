@@ -5,10 +5,12 @@ public class VectorUtil {
 
     static Vector rotate(Vector v, double ang) {
         // Rotate v by ang radians - two dimensions only.
+        return null;
     }
 
     static Vector direction(Vector v) {
         // Returns direction of v, but sets angle to Math.PI/2 when v is the zero vector
 		// Used to avoid exception in Vector.java
+        return null;
     }
 }

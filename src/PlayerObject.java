@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public class PlayerObject extends GameObject implements IViewPort {
 
     private static final Color DEFAULT_COLOR = StdDraw.WHITE;
@@ -7,7 +9,11 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     private Camera cam;
 
-	@Override
+    public PlayerObject(Vector r, Vector v, double mass) {
+        super(-1, r, v, mass);
+    }
+
+    //@Override
     void processCommand(int delay) {
         // Process keys applying to the player
 		// Retrieve 
@@ -16,9 +22,24 @@ public class PlayerObject extends GameObject implements IViewPort {
             Draw dr = cam.getDraw();
             if (dr != null) {
 				// Example code
-                if (dr.isKeyPressed(KeyEvent.VK_UP)) up = true;
-                if (dr.isKeyPressed(KeyEvent.VK_DOWN)) down = true;
+                /*if (dr.isKeyPressed(KeyEvent.VK_UP)) up = true;
+                if (dr.isKeyPressed(KeyEvent.VK_DOWN)) down = true;*/
             }
         }
+    }
+
+    @Override
+    public Vector getLocation() {
+        return null;
+    }
+
+    @Override
+    public Vector getFacingVector() {
+        return null;
+    }
+
+    @Override
+    public double highlightLevel() {
+        return 0;
     }
 }

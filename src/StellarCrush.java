@@ -12,7 +12,7 @@ PRESENTATION:
 -autoscaling universe to keep all universe objects on screen (or making the edge of the universe repel objects)
 -better rendering in camera (better handling of objects on edges, and more accurate location rendering
 -improved gameplay graphics, including pictures/sprites/textures for game objects
--add sounds for for various game events/music: Warning: adding both sounds and music will likely lead to major
+-add sounds for various game events/music: Warning: adding both sounds and music will likely lead to major
 headaches and frustration, due to the way the StdAudio library works.  If you go down this route, you choose
 to walk the road alone...
 -full 3D graphics with 3D universe (no libraries)
@@ -29,7 +29,10 @@ MECHANICS/GAMEPLAY CHANGES:
 --QuadTree implementation with some of what you may want at : http://algs4.cs.princeton.edu/92search/QuadTree.java.html
 --https://github.com/phishman3579/java-algorithms-implementation/blob/master/src/com/jwetherell/algorithms/data_structures/QuadTree.java may also be useful - look at the Point Region Quadtree
 */
-import java.awt.Font;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
 
 public class StellarCrush {
 	// Main game class
@@ -41,7 +44,13 @@ public class StellarCrush {
 	static final double softE = 0.001; // softening factor to avoid division by zero calculating force for co-located objects
 	static double scale = 5e10; // plotted universe size
 
-	public static boolean menu()
+    private static void screen()
+    {
+        new File("screenshots").mkdir();
+        StdDraw.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
+    }
+
+	private static boolean menu()
 	{
 		StdDraw.setCanvasSize();
 		StdDraw.setXscale(0.0, 100.0);
@@ -61,32 +70,64 @@ public class StellarCrush {
 		
 		StdDraw.changeWindowTitle("StellarCrush");
 
-		boolean done = false;
-		while(!done)
-		{
-			//Key handle
-			if(StdDraw.isKeyPressed(77))
-			{
-				done = true;
-			}else if(StdDraw.hasNextKeyTyped())
-			{
-				StdDraw.nextKeyTyped();	//Process key to avoid infinite loop
-				StdDraw.closeWindow();
-				return true;
-			}
-			
-		}
-		StdDraw.closeWindow();
-
-		return false;
+		try{
+            while(true) {
+                //Key handle
+                if (StdDraw.isKeyPressed(KeyEvent.VK_M)) {
+                    if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+                    return false;
+                } else if (StdDraw.isKeyPressed(KeyEvent.VK_P)) {
+                    if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+                    screen();
+                } else if (StdDraw.hasNextKeyTyped()) {
+                    StdDraw.nextKeyTyped();    //Process key to avoid infinite loop
+                    StdDraw.closeWindow();
+                    return true;
+                }
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            StdDraw.closeWindow();
+        }
+        return false;
 	}
 
 	public static void main(String[] args) {
-		
-		while(menu())
-		{
-			//Start game
-		}
+        if(!menu()) //
+        {
+            return;
+        }
+        GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
+        boolean run = true;
+        while (run) // MAIN LOOP
+        {
+            long startTime = System.currentTimeMillis();
+            if (StdDraw.isKeyPressed(77)) {
+                StdDraw.nextKeyTyped();
+                run = false;
+            } else if (StdDraw.isKeyPressed('p')) {
+                StdDraw.nextKeyTyped();
+                screen();
+            }
+
+            long currentTime = System.currentTimeMillis();
+            StdDraw.clear();
+            gameState.update((int) ((currentTime - startTime) * TIME_PER_MS + GAME_DELAY_TIME));
+            gameState.draw();
+            StdDraw.show();
+            try {
+                //Sleep for the next frame
+                Thread.sleep(GAME_DELAY_TIME / TIME_PER_MS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                //Interrupted so return
+                run = false;
+            }
+            StdDraw.enableDoubleBuffering();
+        }
+        StdDraw.closeWindow();
 	}
 
 }

@@ -1,3 +1,5 @@
+import java.util.Collection;
+
 public class Camera {
     // Virtual camera - uses a plane one unit away from the focal point
     // For ease of use, this simply locates where the centre of the object is, and renders it if that is in the field of view.
@@ -9,9 +11,17 @@ public class Camera {
 
     Camera(IViewPort holder, double FOV) {
         // Constructs a camera with field of view FOV, held by holder, and rendered on canvas dr.
+        this.holder = holder;
+        this.FOV = FOV;
+
+        dr = null;
     }
 
 	void render(Collection<GameObject> objects) {
 		// Renders the collection from the camera perspective
 	}
+
+    public Draw getDraw() {
+        return dr;
+    }
 }
