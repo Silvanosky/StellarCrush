@@ -30,6 +30,8 @@ MECHANICS/GAMEPLAY CHANGES:
 --https://github.com/phishman3579/java-algorithms-implementation/blob/master/src/com/jwetherell/algorithms/data_structures/QuadTree.java may also be useful - look at the Point Region Quadtree
 */
 
+import libs.StdDraw;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -66,7 +68,7 @@ public class StellarCrush {
 
 		StdDraw.text(50.0, 35.0, "You are borg. Assimilate all who stand against you!");
 
-		StdDraw.text(50.0, 20.0, "Quit (m). Screencap (p)");
+		libs.StdDraw.text(50.0, 20.0, "Quit (m). Screencap (p)");
 		
 		StdDraw.changeWindowTitle("StellarCrush");
 
@@ -99,18 +101,20 @@ public class StellarCrush {
         {
             return;
         }
+        StdDraw.setCanvasSize();
         GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
         boolean run = true;
         while (run) // MAIN LOOP
         {
             long startTime = System.currentTimeMillis();
-            if (StdDraw.isKeyPressed(77)) {
-                StdDraw.nextKeyTyped();
+            if (StdDraw.isKeyPressed(KeyEvent.VK_M)) {
+                if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
                 run = false;
-            } else if (StdDraw.isKeyPressed('p')) {
-                StdDraw.nextKeyTyped();
+            } else if (StdDraw.isKeyPressed(KeyEvent.VK_P)) {
+                if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
                 screen();
             }
+
 
             long currentTime = System.currentTimeMillis();
             StdDraw.clear();

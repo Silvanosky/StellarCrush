@@ -1,3 +1,5 @@
+import libs.StdDraw;
+
 import java.util.*;
 
 public class GameState {
@@ -8,25 +10,43 @@ public class GameState {
 
     public GameState(PlayerObject player, double radius) {
         this.player = player;
-        StdDraw.setCanvasSize();
         StdDraw.setXscale(-radius, +radius);
-        StdDraw.setYscale(-radius, +radius);
+        libs.StdDraw.setYscale(-radius, +radius);
 
         StdDraw.changeWindowTitle("StellarCrush");
 
         objects = new LinkedList<>();
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 10; i++)
         {
             objects.add(GameObjectLibrary.createAsteroid(i));
         }
+        objects.add(player);
     }
 
     void update(int delay) {
-        Map<GameObject, Vector> f = calculateForces();
+        //Compute
+        Map<GameObject, Vector> f = calculateForces(); //TODO async
 
-        for(GameObject object : objects)
+        for(GameObject object : objects) {
+
             object.move(f.get(object), delay);
+            Vector position = object.getPosition();
+
+            if(Math.abs(position.cartesian(0)) > StellarCrush.scale)
+            {
+                double[] vec = {position.cartesian(0) * -1, position.cartesian(1) };
+                object.setPosition(new Vector(vec));
+            }
+
+            if(Math.abs(position.cartesian(1)) > StellarCrush.scale)
+            {
+                double[] vec = {position.cartesian(0), position.cartesian(1) *-1};
+                object.setPosition(new Vector(vec));
+            }
+        }
+        //Draw
+        player.getCam().render(objects);//TODO async
     }
 
     private Map<GameObject,Vector> calculateForces() {
@@ -47,6 +67,8 @@ public class GameState {
     void draw() {
         for (GameObject object : objects)
             object.draw();
+        //Input
+        player.processCommand(0);
     }
 
 }

@@ -1,6 +1,6 @@
-/******************************************************************************
- *  Compilation:  javac StdDraw.java
- *  Execution:    java StdDraw
+package libs; /******************************************************************************
+ *  Compilation:  javac libs.StdDraw.java
+ *  Execution:    java libs.StdDraw
  *  Dependencies: none
  *
  *  Standard drawing library. This class provides a basic capability for
@@ -39,7 +39,7 @@ import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 /**
- *  The {@code StdDraw} class provides a basic capability for
+ *  The {@code libs.StdDraw} class provides a basic capability for
  *  creating drawings with your programs. It uses a simple graphics model that
  *  allows you to create drawings consisting of points, lines, squares, 
  *  circles, and other geometric shapes in a window on your computer and
@@ -48,21 +48,21 @@ import java.util.TreeSet;
  *  user interaction via the keyboard and mouse.
  *  <p>
  *  <b>Getting started.</b>
- *  To use standard drawing, you must have {@code StdDraw.class} in your
+ *  To use standard drawing, you must have {@code libs.StdDraw.class} in your
  *  Java classpath. If you used our autoinstaller, you should be all set.
  *  Otherwise, download
- *  <a href = "http://introcs.cs.princeton.edu/java/stdlib/StdDraw.java">StdDraw.java</a>
+ *  <a href = "http://introcs.cs.princeton.edu/java/stdlib/StdDraw.java">libs.StdDraw.java</a>
  *  and put a copy in your working directory.
  *  <p>
  *  Now, type the following short program into your editor:
  *  <pre>
  *   public class TestStdDraw {
  *       public static void main(String[] args) {
- *           StdDraw.setPenRadius(0.05);
- *           StdDraw.setPenColor(StdDraw.BLUE);
- *           StdDraw.point(0.5, 0.5);
- *           StdDraw.setPenColor(StdDraw.MAGENTA);
- *           StdDraw.line(0.2, 0.2, 0.8, 0.2);
+ *           libs.StdDraw.setPenRadius(0.05);
+ *           libs.StdDraw.setPenColor(libs.StdDraw.BLUE);
+ *           libs.StdDraw.point(0.5, 0.5);
+ *           libs.StdDraw.setPenColor(libs.StdDraw.MAGENTA);
+ *           libs.StdDraw.line(0.2, 0.2, 0.8, 0.2);
  *       }
  *   }
  *  </pre>
@@ -71,9 +71,9 @@ import java.util.TreeSet;
  *  This program illustrates the two main types of methods in standard
  *  drawing—methods that draw geometric shapes and methods that
  *  control drawing parameters.
- *  The methods {@code StdDraw.line()} and {@code StdDraw.point()}
- *  draw lines and points; the methods {@code StdDraw.setPenRadius()}
- *  and {@code StdDraw.setPenColor()} control the line thickness and color.
+ *  The methods {@code libs.StdDraw.line()} and {@code libs.StdDraw.point()}
+ *  draw lines and points; the methods {@code libs.StdDraw.setPenRadius()}
+ *  and {@code libs.StdDraw.setPenColor()} control the line thickness and color.
  *  <p>
  *  <b>Points and lines.</b>
  *  You can draw points and line segments with the following methods:
@@ -122,7 +122,7 @@ import java.util.TreeSet;
  *  The arc is from the circle centered at (<em>x</em>, <em>y</em>) of the specified radius.
  *  The arc extends from angle1 to angle2. By convention, the angles are
  *  <em>polar</em> (counterclockwise angle from the <em>x</em>-axis)
- *  and represented in degrees. For example, {@code StdDraw.arc(0.0, 0.0, 1.0, 0, 90)}
+ *  and represented in degrees. For example, {@code libs.StdDraw.arc(0.0, 0.0, 1.0, 0, 90)}
  *  draws the arc of the unit circle from 3 o'clock (0 degrees) to 12 o'clock (90 degrees).
  *  <p>
  *  <b>Polygons.</b>
@@ -138,7 +138,7 @@ import java.util.TreeSet;
  *  <pre>
  *   double[] x = { 0.1, 0.2, 0.3, 0.2 };
  *   double[] y = { 0.2, 0.3, 0.2, 0.1 };
- *   StdDraw.filledPolygon(x, y);
+ *   libs.StdDraw.filledPolygon(x, y);
  *  </pre>
  *  <p>
  *  <b>Pen size.</b>
@@ -154,7 +154,7 @@ import java.util.TreeSet;
  *  <li> {@link #setPenRadius(double radius)}
  *  </ul>
  *  <p>
- *  For example, {@code StdDraw.setPenRadius(0.025)} makes
+ *  For example, {@code libs.StdDraw.setPenRadius(0.025)} makes
  *  the thickness of the lines and the size of the points to be five times
  *  the 0.005 default.
  *  To draw points with the minimum possible radius (one pixel on typical
@@ -180,7 +180,7 @@ import java.util.TreeSet;
  *  {@link #PINK}, {@link #RED}, {@link #WHITE}, {@link #YELLOW},
  *  {@link #BOOK_BLUE}, {@link #BOOK_LIGHT_BLUE}, {@link #BOOK_RED}, and
  *  {@link #PRINCETON_ORANGE}.
- *  For example, {@code StdDraw.setPenColor(StdDraw.MAGENTA)} sets the
+ *  For example, {@code libs.StdDraw.setPenColor(libs.StdDraw.MAGENTA)} sets the
  *  pen color to magenta.
  *  <p>
  *  <b>Canvas size.</b>
@@ -195,7 +195,7 @@ import java.util.TreeSet;
  *  It also erases the current drawing and resets the coordinate system,
  *  pen radius, pen color, and font back to their default values.
  *  Ordinarly, this method is called once, at the very beginning of a program.
- *  For example, {@code StdDraw.setCanvasSize(800, 800)}
+ *  For example, {@code libs.StdDraw.setCanvasSize(800, 800)}
  *  sets the canvas size to be 800-by-800 pixels.
  *  <p>
  *  <b>Canvas scale and coordinate system.</b>
@@ -211,7 +211,7 @@ import java.util.TreeSet;
  *  The arguments are the coordinates of the minimum and maximum 
  *  <em>x</em>- or <em>y</em>-coordinates that will appear in the canvas.
  *  For example, if you  wish to use the default coordinate system but
- *  leave a small margin, you can call {@code StdDraw.setScale(-.05, 1.05)}.
+ *  leave a small margin, you can call {@code libs.StdDraw.setScale(-.05, 1.05)}.
  *  <p>
  *  These methods change the coordinate system for subsequent drawing
  *  commands; they do not affect previous drawings.
@@ -244,8 +244,8 @@ import java.util.TreeSet;
  *  code fragment sets the font to Arial Bold, 60 point.
  *  <pre>
  *   Font font = new Font("Arial", Font.BOLD, 60);
- *   StdDraw.setFont(font);
- *   StdDraw.text(0.5, 0.5, "Hello, World");
+ *   libs.StdDraw.setFont(font);
+ *   libs.StdDraw.text(0.5, 0.5, "Hello, World");
  *  </pre>
  *  <p>
  *  <b>Images.</b>
@@ -284,7 +284,7 @@ import java.util.TreeSet;
  *  <p>
  *  The first method clears the canvas to white; the second method
  *  allows you to specify a color of your choice. For example,
- *  {@code StdDraw.clear(StdDraw.LIGHT_GRAY)} clears the canvas to a shade
+ *  {@code libs.StdDraw.clear(libs.StdDraw.LIGHT_GRAY)} clears the canvas to a shade
  *  of gray.
  *  <p>
  *  <b>Computer animations and double buffering.</b>
@@ -328,17 +328,17 @@ import java.util.TreeSet;
  *  <p>
  *  For example, this code fragment animates two balls moving in a circle.
  *  <pre>
- *   StdDraw.setScale(-2, +2);
- *   StdDraw.enableDoubleBuffering();
+ *   libs.StdDraw.setScale(-2, +2);
+ *   libs.StdDraw.enableDoubleBuffering();
  *
  *   for (double t = 0.0; true; t += 0.02) {
  *       double x = Math.sin(t);
  *       double y = Math.cos(t);
- *       StdDraw.clear();
- *       StdDraw.filledCircle(x, y, 0.05);
- *       StdDraw.filledCircle(-x, -y, 0.05);
- *       StdDraw.show();
- *       StdDraw.pause(20);
+ *       libs.StdDraw.clear();
+ *       libs.StdDraw.filledCircle(x, y, 0.05);
+ *       libs.StdDraw.filledCircle(-x, -y, 0.05);
+ *       libs.StdDraw.show();
+ *       libs.StdDraw.pause(20);
  *   }
  *  </pre>
  *  <p>
@@ -701,6 +701,29 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         return menuBar;
     }
 
+    /**
+     * Sets the upper-left hand corner of the drawing window to be (x, y), where (0, 0) is upper left.
+     *
+     * @param  x the number of pixels from the left
+     * @param  y the number of pixels from the top
+     * @throws IllegalArgumentException if the width or height is 0 or negative
+     */
+    public static void setLocationOnScreen(int x, int y) {
+        if (x <= 0 || y <= 0)
+            throw new IllegalArgumentException();
+        frame.setLocation(x, y);
+    }
+
+    public static Point getLocationOnScreen()
+    {
+        return frame.getLocationOnScreen();
+    }
+
+    public static void toFocus()
+    {
+        frame.toFront();
+    }
+
 
     /***************************************************************************
      *  User and screen coordinate systems.
@@ -864,11 +887,11 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
      * Sets the pen color to the specified color.
      * <p>
      * The predefined pen colors are
-     * {@code StdDraw.BLACK}, {@code StdDraw.BLUE}, {@code StdDraw.CYAN},
-     * {@code StdDraw.DARK_GRAY}, {@code StdDraw.GRAY}, {@code StdDraw.GREEN},
-     * {@code StdDraw.LIGHT_GRAY}, {@code StdDraw.MAGENTA}, {@code StdDraw.ORANGE},
-     * {@code StdDraw.PINK}, {@code StdDraw.RED}, {@code StdDraw.WHITE}, and
-     * {@code StdDraw.YELLOW}.
+     * {@code libs.StdDraw.BLACK}, {@code libs.StdDraw.BLUE}, {@code libs.StdDraw.CYAN},
+     * {@code libs.StdDraw.DARK_GRAY}, {@code libs.StdDraw.GRAY}, {@code libs.StdDraw.GREEN},
+     * {@code libs.StdDraw.LIGHT_GRAY}, {@code libs.StdDraw.MAGENTA}, {@code libs.StdDraw.ORANGE},
+     * {@code libs.StdDraw.PINK}, {@code libs.StdDraw.RED}, {@code libs.StdDraw.WHITE}, and
+     * {@code libs.StdDraw.YELLOW}.
      *
      * @param color the color to make the pen
      */
@@ -1246,7 +1269,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
             }
         }
 
-        // in case file is inside a .jar (classpath relative to StdDraw)
+        // in case file is inside a .jar (classpath relative to libs.StdDraw)
         if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
             URL url = StdDraw.class.getResource(filename);
             if (url != null)
@@ -1284,9 +1307,9 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
             // ignore
         }
 
-        // in case file is inside a .jar (classpath relative to StdDraw)
+        // in case file is inside a .jar (classpath relative to libs.StdDraw)
         try {
-            URL url = StdDraw.class.getResource(filename);
+            URL url = libs.StdDraw.class.getResource(filename);
             BufferedImage image = ImageIO.read(url);
             return image;
         } 
@@ -1296,7 +1319,7 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
 
         // in case file is inside a .jar (classpath relative to root of jar)
         try {
-            URL url = StdDraw.class.getResource("/" + filename);
+            URL url = libs.StdDraw.class.getResource("/" + filename);
             BufferedImage image = ImageIO.read(url);
             return image;
         } 
@@ -1832,8 +1855,13 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         }
     }
 
+    public static int getWidth() {
+        return width;
+    }
 
-
+    public static int getHeight() {
+        return height;
+    }
 
     /**
      * Test client.
