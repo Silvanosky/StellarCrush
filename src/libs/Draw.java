@@ -252,6 +252,9 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         offscreen.addRenderingHints(hints);
 
+        //Last fill is the first to see !
+        offscreen.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+
         // frame stuff
         ImageIcon icon = new ImageIcon(onscreenImage);
         draw = new JLabel(icon);
@@ -269,6 +272,8 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         frame.pack();
         frame.requestFocusInWindow();
         frame.setVisible(true);
+
+
     }
 
     public void closeWindow()

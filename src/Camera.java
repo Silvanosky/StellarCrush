@@ -1,8 +1,10 @@
-import libs.StdDraw;
 import libs.Draw;
+import libs.Entry;
+import libs.StdDraw;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.PriorityQueue;
 
 public class Camera {
     // Virtual camera - uses a plane one unit away from the focal point
@@ -37,6 +39,10 @@ public class Camera {
 
 	void render(Collection<GameObject> objects) {
         dr.clear();
+
+        //Use this queue to first
+        PriorityQueue<Entry<Runnable, Double>> renderer = new PriorityQueue<>((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
+
         for(GameObject obj : objects) {
             if(holder.getId() == obj.getId())
                 continue;
@@ -44,20 +50,29 @@ public class Camera {
             Vector position = obj.getPosition();
             Vector location = holder.getLocation();
 
-            double deltaX = position.cartesian(0) - location.cartesian(0);
-            double deltaY = position.cartesian(1) - location.cartesian(1);
+            double deltaX = (position.cartesian(0) - location.cartesian(0)) / StellarCrush.scale;
+            double deltaY = (position.cartesian(1) - location.cartesian(1)) / StellarCrush.scale;
             double angle = Math.atan2(deltaY, deltaX) - holder.getYaw();
 
             if (Math.abs(angle) > FOV/2.0) {
                 continue;//Object out of view don't show it
             }
-            double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) / StellarCrush.scale;
-            if(dist * dist < 0.5)
-                dist = 1.0;
+            final double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) ;
+            renderer.add(new Entry<>(() -> {
+                double finalDist = dist;
+                if(finalDist * finalDist < 0.0001)
+                    finalDist = 0.0001;
 
-            dr.setPenRadius(0.2 * obj.getRadius() * (1/dist));
-            dr.setPenColor(obj.getColor());
-            dr.point(angle, 0.0);
+                dr.setPenColor(obj.getColor());
+                dr.setPenRadius((GameObject.SIZE * obj.getRadius()) / finalDist);
+                dr.point(Math.sin(angle), 0.0);
+
+            }, dist));
+        }
+
+        while (!renderer.isEmpty())
+        {
+            renderer.poll().getKey().run();
         }
         dr.show();
         dr.enableDoubleBuffering();

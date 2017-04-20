@@ -13,6 +13,8 @@ public class GameObject {
     private double radius;
     private Color color;
 
+    static final double SIZE = 0.05; // gravitational constant
+
     public GameObject(int id, Vector r, Vector v, double mass, double radius) {
         this.id = id;
         this.r = r;
@@ -43,7 +45,7 @@ public class GameObject {
     }
 
     public void draw() {
-        StdDraw.setPenRadius(0.05 * radius);
+        StdDraw.setPenRadius(SIZE * radius);
         StdDraw.setPenColor(color);
         //libs.StdDraw.setPenRadius(1.0);
         libs.StdDraw.point(r.cartesian(0), r.cartesian(1));
