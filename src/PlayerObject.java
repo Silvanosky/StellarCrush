@@ -44,11 +44,11 @@ public class PlayerObject extends GameObject implements IViewPort {
                 Vector direction = getFacingVector();
                 if (dr.isKeyPressed(KeyEvent.VK_UP))
                 {
-                    v = v.plus(direction.times(100.0));
+                    v = v.plus(direction.times(50.0));
                 }
                 if (dr.isKeyPressed(KeyEvent.VK_DOWN))
                 {
-                    v = v.plus(direction.times(-100.0));
+                    v = v.plus(direction.times(-50.0));
                 }
 
                 //Rotation

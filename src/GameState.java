@@ -32,17 +32,18 @@ public class GameState {
 
             object.move(f.get(object), delay);
             Vector position = object.getPosition();
+            Vector velocity = object.getVelocity();
 
             if(Math.abs(position.cartesian(0)) > StellarCrush.scale)
             {
-                double[] vec = {position.cartesian(0) * -1, position.cartesian(1) };
-                object.setPosition(new Vector(vec));
+                double[] vec = {velocity.cartesian(0) * -1, velocity.cartesian(1) };
+                object.setVelocity(new Vector(vec));
             }
 
             if(Math.abs(position.cartesian(1)) > StellarCrush.scale)
             {
-                double[] vec = {position.cartesian(0), position.cartesian(1) *-1};
-                object.setPosition(new Vector(vec));
+                double[] vec = {velocity.cartesian(0), velocity.cartesian(1) *-1};
+                object.setVelocity(new Vector(vec));
             }
         }
         //Draw
