@@ -15,8 +15,6 @@ public class Camera {
     private final Draw dr; // Canvas on which to draw
     private double FOV; // field of view of camera
 
-
-
     Camera(IViewPort holder, double FOV) {
         // Constructs a camera with field of view FOV, held by holder, and rendered on canvas dr.
         this.holder = holder;

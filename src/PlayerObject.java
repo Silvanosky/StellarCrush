@@ -15,10 +15,10 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     private double yaw;
 
-    public PlayerObject(Vector r, Vector v, double mass) {
-        super(-1, r, v, mass, 1.0);
-        this.cam = new Camera(this, DEFAULT_FOV);
+    public PlayerObject(Vector r, Vector v, double mass, double radius) {
+        super(-1, r, v, mass, radius);
 
+        this.cam = new Camera(this, DEFAULT_FOV);
         this.yaw = 0;
     }
 
@@ -44,11 +44,11 @@ public class PlayerObject extends GameObject implements IViewPort {
                 Vector direction = getFacingVector();
                 if (dr.isKeyPressed(KeyEvent.VK_UP))
                 {
-                    v = v.plus(direction.times(50.0));
+                    setVelocity(getVelocity().plus(direction.times(50.0)));
                 }
                 if (dr.isKeyPressed(KeyEvent.VK_DOWN))
                 {
-                    v = v.plus(direction.times(-50.0));
+                    setVelocity(getVelocity().plus(direction.times(-50.0)));
                 }
 
                 //Rotation
@@ -58,14 +58,20 @@ public class PlayerObject extends GameObject implements IViewPort {
                     yaw += FOV_INCREMENT;
 
                 yaw = clampYaw(yaw);// -Pi -> Pi
-
-                //Circle for direction
-                libs.StdDraw.setPenRadius(0.015);
-                libs.StdDraw.setPenColor(Color.RED);
-                double rayon = getRadius() * 0.05 * StellarCrush.scale;
-                libs.StdDraw.point( r.cartesian(0) + (Math.cos(yaw) * rayon), r.cartesian(1) + (Math.sin(yaw) * rayon));
             }
         }
+    }
+
+    @Override
+    public void draw()
+    {
+        super.draw();
+
+        //Circle for direction
+        StdDraw.setPenRadius(0.015);
+        StdDraw.setPenColor(Color.RED);
+        double rayon = getRadius() * GameObject.SIZE * StellarCrush.scale;
+        StdDraw.point( getPosition().cartesian(0) + (Math.cos(yaw) * rayon), getPosition().cartesian(1) + (Math.sin(yaw) * rayon));
     }
 
     public Camera getCam() {
