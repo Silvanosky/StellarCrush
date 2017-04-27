@@ -46,6 +46,8 @@ public class StellarCrush {
 	static final double softE = 0.001; // softening factor to avoid division by zero calculating force for co-located objects
 	static double scale = 5e10; // plotted universe size
 
+    private static long FPS = 0;
+
     private static void screen()
     {
         new File("screenshots").mkdir();
@@ -96,14 +98,22 @@ public class StellarCrush {
         return false;
 	}
 
+	private static long clamp(long value)
+    {
+        if(value < 0)
+            return 0;
+        return value;
+    }
 	public static void main(String[] args) {
         if(!menu()) //
         {
             return;
         }
-        StdDraw.setCanvasSize();
+        StdDraw.setCanvasSize(1024, 1024);
         GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
         boolean run = true;
+        long time = System.currentTimeMillis();
+        long frame = 0;
         while (run) // MAIN LOOP
         {
             long startTime = System.currentTimeMillis();
@@ -115,23 +125,34 @@ public class StellarCrush {
                 screen();
             }
 
-
             long currentTime = System.currentTimeMillis();
             StdDraw.clear();
-            gameState.update((int) ((currentTime - startTime) * TIME_PER_MS + GAME_DELAY_TIME));
+            gameState.update(GAME_DELAY_TIME);
             gameState.draw();
             StdDraw.show();
             try {
                 //Sleep for the next frame
-                Thread.sleep(GAME_DELAY_TIME / TIME_PER_MS);
+                Thread.sleep(clamp(GAME_DELAY_TIME / TIME_PER_MS - (currentTime - startTime) * TIME_PER_MS));
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 //Interrupted so return
                 run = false;
             }
             StdDraw.enableDoubleBuffering();
+            frame++;
+
+            if(System.currentTimeMillis() - time > 1000)
+            {
+                FPS = frame;
+                System.out.println("Fps: "+ FPS);
+                frame = 0;
+                time = System.currentTimeMillis();
+            }
         }
         StdDraw.closeWindow();
 	}
 
+    public static long getFPS() {
+        return FPS;
+    }
 }

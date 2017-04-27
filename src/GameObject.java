@@ -53,9 +53,8 @@ public class GameObject {
     }
 
     public void draw() {
-        StdDraw.setPenRadius(SIZE * radius);
         StdDraw.setPenColor(color);
-        StdDraw.point(r.cartesian(0), r.cartesian(1));
+        StdDraw.filledCircle(r.cartesian(0), r.cartesian(1), SIZE * radius* StellarCrush.scale);
     }
 
     static Vector collisionResult(double cr, //coefficient of restitution
@@ -110,11 +109,10 @@ public class GameObject {
     public boolean collideWith(GameObject object)
     {
         Vector position = object.getPosition();
-        double v = position.distanceTo(r);
         //Fast check distance
-        if(v < (object.getRadius() + radius) * SIZE * StellarCrush.scale)
+        if(VectorUtil.distanceMinusTo(position, r, (object.getRadius() + radius) * SIZE * StellarCrush.scale))
         {
-            //Still collide return false for velocity increase;
+           /* //Still collide return false for velocity increase;
             if(colliders.contains(object.getId()))
                 return false;
             else
@@ -122,10 +120,11 @@ public class GameObject {
                 //Never collided so compute velocity
                 colliders.add(object.getId());
                 return true;
-            }
+            }*/
+            return true;
         }
         //No longer colliding so remove and stop all
-        colliders.remove(object.getId());
+        //colliders.remove(object.getId());
 
         return false;
     }

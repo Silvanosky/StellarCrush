@@ -65,13 +65,31 @@ public class PlayerObject extends GameObject implements IViewPort {
     @Override
     public void draw()
     {
-        super.draw();
-
         //Circle for direction
-        StdDraw.setPenRadius(0.015);
         StdDraw.setPenColor(Color.RED);
-        double rayon = getRadius() * GameObject.SIZE * StellarCrush.scale;
-        StdDraw.point( getPosition().cartesian(0) + (Math.cos(yaw) * rayon), getPosition().cartesian(1) + (Math.sin(yaw) * rayon));
+        double rayon = getRadius() * SIZE * StellarCrush.scale;
+        /*StdDraw.filledCircle( ,
+                getPosition().cartesian(1) + (Math.sin(yaw) * rayon),
+                0.015 * StellarCrush.scale);*/
+
+        double length = 0.018 * StellarCrush.scale;
+        double width = Math.PI/12;
+
+        double[] x = new double[3];//Not the choice with stddraw so need to use array
+        double[] y = new double[3];
+
+        x[0] = getPosition().cartesian(0) + (Math.cos(yaw - width) * rayon);
+        y[0] = getPosition().cartesian(1) + (Math.sin(yaw - width) * rayon);
+
+        x[1] = getPosition().cartesian(0) + (Math.cos(yaw + width) * rayon);
+        y[1] = getPosition().cartesian(1) + (Math.sin(yaw + width) * rayon);
+
+        x[2] = getPosition().cartesian(0) + (Math.cos(yaw) * (rayon + length));
+        y[2] = getPosition().cartesian(1) + (Math.sin(yaw) * (rayon + length));
+
+        StdDraw.filledPolygon(x, y);
+
+        super.draw();
     }
 
     public Camera getCam() {

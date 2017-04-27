@@ -13,4 +13,19 @@ public class VectorUtil {
 		// Used to avoid exception in Vector.java
         return null;
     }
+
+    //Check the distance between two vector without calling sqrt which have heavy complexity
+    static boolean distanceMinusTo(Vector a, Vector b, double distance)
+    {
+        Vector minus = a.minus(b);
+        return minus.dot(minus) < distance * distance;
+    }
+
+    //Check the distance between two vector without calling sqrt which have heavy complexity
+    static boolean distanceMaxTo(Vector a, Vector b, double distance)
+    {
+        Vector minus = a.minus(b);
+        return minus.dot(minus) > distance * distance;
+    }
+
 }
