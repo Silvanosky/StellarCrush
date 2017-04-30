@@ -1,5 +1,7 @@
 package libs;
 
+import java.awt.event.KeyEvent;
+
 /******************************************************************************
  *  Compilation:  javac DrawListener.java
  *  Execution:    none
@@ -37,9 +39,9 @@ public interface DrawListener {
     /**
      * Invoked when a key has been typed.
      *
-     * @param c the character typed
+     * @param e the character typed
      */
-    void keyTyped(char c);
+    void keyTyped(int keycode);
 
     /**
      * Invoked when a key has been pressed.

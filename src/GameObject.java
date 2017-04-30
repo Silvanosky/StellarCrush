@@ -1,7 +1,10 @@
+import libs.Draw;
+
 import java.awt.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
+
 
 public class GameObject {
     private int id;
@@ -51,10 +54,10 @@ public class GameObject {
         //return delta.direction().times(f);
     }
 
-    public void draw() {
-        StellarCrush.getDraw().setPenColor(color);
+    public void draw(Draw dr) {
+        dr.setPenColor(color);
         double v = SIZE * radius * StellarCrush.scale;
-        StellarCrush.getDraw().filledCircle(r.cartesian(0), r.cartesian(1), v);
+        dr.filledCircle(r.cartesian(0), r.cartesian(1), v);
     }
 
     static Vector collisionResult(double cr, //coefficient of restitution

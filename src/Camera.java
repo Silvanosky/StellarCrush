@@ -19,20 +19,23 @@ public class Camera {
         // Constructs a camera with field of view FOV, held by holder, and rendered on canvas dr.
         this.holder = holder;
 
-        dr = new Draw();
+        dr = StellarCrush.createDraw();
+        dr.setCanvasSize(780, 1024);
+        double ratio = (double) dr.getWidth() / dr.getHeight();
+        dr.setXscale(100, 0);
+        dr.setYscale(100.0/ratio, 0);
+
+        //dr.addListener(StellarCrush.getDraw());
         Point location = StellarCrush.getDraw().getLocationOnScreen();
-
         setFOV(FOV);
-
-        dr.setLocationOnScreen(location.x + StellarCrush.getDraw().getWidth()+ 11, location.y);
+        dr.setLocationOnScreen(location.x + StellarCrush.getDraw().getWidth(), location.y);
+        //dr.setLocationOnScreen(location.x, location.y + StellarCrush.getDraw().getHeight() + 35);
         dr.toFocus();
     }
 
     public void setFOV(double FOV)
     {
         this.FOV = FOV;
-        dr.setXscale(FOV/2.0, -FOV/2.0);
-        dr.setYscale(-1.0, 1.0);
     }
 
     private double clampYaw(double yaw)
@@ -68,18 +71,16 @@ public class Camera {
             final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
             renderer.add(new Entry<>(() -> {
                 double finalDist = dist;
-                if(finalDist * finalDist < 0.0001)
-                    finalDist = 0.0001;
-
                 double radius =(GameObject.SIZE * obj.getRadius()) / finalDist;
-                double pos = Math.sin(angle);
+                double posx = Math.sin(angle);
+                double posy = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
                 dr.setPenColor(Color.RED);
                 dr.setPenRadius(radius * 1.01);
-                dr.point(pos, 0.0);
+                dr.point(scaleX(posx), posy);
 
                 dr.setPenColor(obj.getColor());
                 dr.setPenRadius(radius);
-                dr.point(pos, 0.0);
+                dr.point(scaleX(posx), posy);
 
             }, dist));
         }
@@ -88,11 +89,68 @@ public class Camera {
         {
             renderer.poll().getKey().run();
         }
+
+        showHUD();
+
         dr.show();
         dr.enableDoubleBuffering();
 	}
 
+	private void showHUD()
+    {
+        dr.setPenColor(Color.black);
+        dr.text(90, scaleY(99), "FPS: " + StellarCrush.getFPS());
+
+        // orientation
+        double ox = 50.0;
+        double oy = scaleY(90.0);
+
+        double yaw = holder.getYaw() + Math.PI;
+        double v = -holder.getVelocity().cartesian(1);
+        if(Math.abs(v) < 0.1)
+        {
+            v = 0.0;
+        }
+        double v1 = -holder.getVelocity().cartesian(0);
+        if(Math.abs(v1) < 0.1) {
+            v1 = 0.0;
+        }
+        double velocity = Math.atan2(v, v1);
+        drawTriangle(dr, Color.BLACK, ox, oy, 3, 2, Math.PI/6, velocity);
+
+        drawTriangle(dr, Color.RED, ox, oy, 3, 2, Math.PI/6, yaw);
+
+        dr.setPenColor(holder.getColor());
+        dr.setPenRadius(0.1);
+        dr.point(ox, oy);
+
+        dr.setPenColor(Color.BLACK);
+        dr.text(50.0, scaleY(85), "SpeedY: " +  String.format("%.0f", -v));
+        dr.text(65.0, scaleY(90), "SpeedX: " +  String.format("%.0f", -v1));
+
+    }
+
     public Draw getDraw() {
         return dr;
     }
+
+    private void drawTriangle(Draw dr, Color color,  double ox, double oy, double rayon, double length, double width, double yaw)
+    {
+        dr.setPenColor(color);
+        double[] x = new double[3];//Not the choice with stddraw so need to use array
+        double[] y = new double[3];
+
+        x[0] = ox + (Math.cos(yaw - width) * rayon);
+        y[0] = oy + (Math.sin(yaw - width) * rayon);
+
+        x[1] = ox + (Math.cos(yaw + width) * rayon);
+        y[1] = oy + (Math.sin(yaw + width) * rayon);
+
+        x[2] = ox + (Math.cos(yaw) * (rayon + length));
+        y[2] = oy + (Math.sin(yaw) * (rayon + length));
+        dr.filledPolygon(x, y);
+    }
+
+    private double  scaleX(double x) { return 100  * (x + FOV/2.0) / FOV; }
+    private double  scaleY(double y) { return dr.getYmin() * y / 100; }
 }

@@ -24,7 +24,7 @@ public class GameObjectLibrary {
     public static GameObject createAsteroidCircle(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
-        double radius = random.nextDouble() * 2.01;
+        double radius = random.nextDouble() * 3.0;
 
         double pos = random.nextDouble() * Math.PI * 2;
         double distance = (ASTEROID_RADIUS * StellarCrush.scale)+ random.nextDouble() * ASTEROID_WIDTH * StellarCrush.scale ;
@@ -34,7 +34,7 @@ public class GameObjectLibrary {
                 (-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0};*/
 
         Vector r = new Vector(position);
-        Vector v = new Vector(new double[]{Math.sin(pos), -Math.cos(pos)}).times(1200);
+        Vector v = new Vector(new double[]{Math.sin(pos), -Math.cos(pos)}).times(2200);
         return new GameObject(id, r, v, mass, radius);
     }
 
@@ -42,7 +42,7 @@ public class GameObjectLibrary {
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
         mass *= 2;
-        double radius = random.nextDouble() * 0.5;
+        double radius = random.nextDouble() * 2.0;
 
         double pos = random.nextDouble() * Math.PI * 2;
         double distance = StellarCrush.scale;

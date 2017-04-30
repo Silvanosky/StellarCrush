@@ -205,18 +205,12 @@ public class GameState {
         {
             double[] vec = {velocity.cartesian(0) * -1.0 , velocity.cartesian(1)};
             object.setVelocity(new Vector(vec));
-
-           /* double[] pos = {Math.abs(velocity.cartesian(1) - StdDraw.getXmin()), 0.0};
-            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
         }
 
         if(position.cartesian(0) + object.getRealRadius() > xmax)
         {
             double[] vec = {velocity.cartesian(0) * -1.0 , velocity.cartesian(1)};
             object.setVelocity(new Vector(vec));
-
-            /*double[] pos = {-Math.abs(velocity.cartesian(1) - StdDraw.getXmax()), 0.0};
-            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
         }
 
 
@@ -224,18 +218,12 @@ public class GameState {
         {
             double[] vec = {velocity.cartesian(0), velocity.cartesian(1) * -1.0};
             object.setVelocity(new Vector(vec));
-
-           /* double[] pos = {0.0, Math.abs(velocity.cartesian(1) - StdDraw.getYmin())};
-            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
         }
 
         if(position.cartesian(1) + object.getRealRadius() > ymax)
         {
             double[] vec = {velocity.cartesian(0), velocity.cartesian(1) * -1.0};
             object.setVelocity(new Vector(vec));
-
-            /*double[] pos = {0.0, -Math.abs(velocity.cartesian(1) - StdDraw.getYmax())};
-            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
         }
     }
 
@@ -245,7 +233,7 @@ public class GameState {
         {
             if(objects.size() < MAX_ASTEROID_NUMBER) //We don't want to crash the game
             {
-                addGameObject((Math.random() > 0.1) ? GameObjectLibrary.createAsteroidCircle(number++) : GameObjectLibrary.createBulltAsteroid(number++));
+                addGameObject((Math.random() > 0.05) ? GameObjectLibrary.createAsteroidCircle(number++) : GameObjectLibrary.createBulltAsteroid(number++));
             }
             lastSpawnedAsteroid = System.currentTimeMillis();
         }
@@ -301,7 +289,7 @@ public class GameState {
 
     synchronized void draw() {
         for (GameObject object : this.objects)
-            object.draw();
+            object.draw(StellarCrush.getDraw());
 
         new Thread(() -> player.getCam().render(objects)).start();
     }

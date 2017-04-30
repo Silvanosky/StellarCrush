@@ -209,7 +209,9 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
     private final TreeSet<Integer> keysDown = new TreeSet<Integer>();
 
     // event-based listeners
-    private final ArrayList<DrawListener> listeners = new ArrayList<DrawListener>();
+    private final ArrayList<DrawListener> listeners = new ArrayList<>();
+
+    private boolean undecorated = false;
 
 
     /**
@@ -229,10 +231,16 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         init();
     }
 
+    public Draw(boolean undecorated) {
+        this.undecorated = undecorated;
+        init();
+    }
+
     private void init() {
         closeWindow();
 
         frame = new JFrame();
+        frame.setUndecorated(undecorated);
         offscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         onscreenImage  = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         offscreen = offscreenImage.createGraphics();
@@ -274,6 +282,11 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         frame.setVisible(true);
 
 
+    }
+
+    public void setVisible(boolean visible)
+    {
+        frame.setVisible(visible);
     }
 
     public void closeWindow()
@@ -842,7 +855,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
         // in case file is inside a .jar (classpath relative to StdDraw)
         try {
-            URL url = StdDraw.class.getResource(filename);
+            URL url = Draw.class.getResource(filename);
             return ImageIO.read(url);
         } 
         catch (IOException e) {
@@ -851,7 +864,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
         // in case file is inside a .jar (classpath relative to root of jar)
         try {
-            URL url = StdDraw.class.getResource("/" + filename);
+            URL url = Draw.class.getResource("/" + filename);
             return ImageIO.read(url);
         } 
         catch (IOException e) {
@@ -1348,7 +1361,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
         // notify all listeners
         for (DrawListener listener : listeners)
-            listener.keyTyped(e.getKeyChar());
+            listener.keyTyped(e.getKeyCode());
     }
 
     /**
@@ -1376,7 +1389,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
         // notify all listeners
         for (DrawListener listener : listeners)
-            listener.keyPressed(e.getKeyCode());
+            listener.keyReleased(e.getKeyCode());
     }
 
 
@@ -1439,5 +1452,9 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
     public int getHeight() {
         return height;
+    }
+
+    public void setUndecorated(boolean undecorated) {
+        frame.setUndecorated(undecorated);
     }
 }

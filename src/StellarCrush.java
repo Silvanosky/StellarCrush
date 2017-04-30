@@ -33,7 +33,6 @@ MECHANICS/GAMEPLAY CHANGES:
 import libs.Draw;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
 public class StellarCrush {
@@ -51,13 +50,16 @@ public class StellarCrush {
     private static Draw dr;
     private static MainKeyListener listener;
 
-    private static void screen()
+    //0: menu, 1: game, 2: game over; -1: stop all
+    private static int state = 0;
+
+    public static void screen()
     {
         new File("screenshots").mkdir();
         dr.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
     }
 
-	private static boolean menu()
+	private static void menu()
 	{
         dr.setXscale(0.0, 100.0);
         dr.setYscale(0.0, 100.0);
@@ -76,23 +78,8 @@ public class StellarCrush {
 
         dr.changeWindowTitle("StellarCrush");
 
-
 		try{
-            while(true) {
-                //Key handle
-                if (dr.isKeyPressed(KeyEvent.VK_M)) {
-                    if(dr.hasNextKeyTyped())
-                        dr.nextKeyTyped();
-                    return false;
-                } else if (dr.isKeyPressed(KeyEvent.VK_P)) {
-                    if(dr.hasNextKeyTyped())
-                        dr.nextKeyTyped();
-                    screen();
-                } else if (dr.hasNextKeyTyped()) {
-                    dr.nextKeyTyped();    //Process key to avoid infinite loop
-                    dr.closeWindow();
-                    return true;
-                }
+            while(state == 0) {
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
@@ -100,7 +87,6 @@ public class StellarCrush {
         } finally {
             dr.closeWindow();
         }
-        return false;
 	}
 
 	private static long clamp(long value)
@@ -109,59 +95,56 @@ public class StellarCrush {
             return 0;
         return value;
     }
-	public static void main(String[] args) {
-        dr = new Draw();
-        listener = new MainKeyListener();
+
+    public static Draw createDraw()
+    {
+        Draw dr = new Draw(true);
         dr.addListener(listener);
+        return dr;
+    }
 
-        if(!menu()) //
+	public static void main(String[] args) {
+        listener = new MainKeyListener();
+
+        while (state != -1)
         {
-            return;
-        }
-        dr = new Draw();
-        dr.setCanvasSize(1024, 800);
-        GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
-        boolean run = true;
-        long time = System.currentTimeMillis();
-        long frame = 0;
-        long lastFrame = System.currentTimeMillis();
-        while (run) // MAIN LOOP
-        {
-            long startTime = System.currentTimeMillis();
-            if (dr.isKeyPressed(KeyEvent.VK_M)) {
-                if(dr.hasNextKeyTyped()) dr.nextKeyTyped();
-                run = false;
-            } else if (dr.isKeyPressed(KeyEvent.VK_P)) {
-                if(dr.hasNextKeyTyped()) dr.nextKeyTyped();
-                screen();
-            }
+            dr = createDraw();
+            menu();
+            dr = createDraw();
 
-            long currentTime = System.currentTimeMillis();
-            dr.clear();
-            gameState.update((int) (GAME_DELAY_TIME + (currentTime - lastFrame) * TIME_PER_MS));
-            gameState.draw();
-            dr.show();
-            try {
-                //Sleep for the next frame
-                Thread.sleep(clamp((GAME_DELAY_TIME - (currentTime - startTime) * TIME_PER_MS) / TIME_PER_MS));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                //Interrupted so return
-                run = false;
-            }
-            dr.enableDoubleBuffering();
-            frame++;
-
-            if(System.currentTimeMillis() - time > 1000)
+            dr.setCanvasSize(1024, 1024);
+            GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
+            long time = System.currentTimeMillis();
+            long frame = 0;
+            long lastFrame = System.currentTimeMillis();
+            while (state == 1) // MAIN LOOP
             {
-                FPS = frame;
-                System.out.println("Fps: "+ FPS);
-                frame = 0;
-                time = System.currentTimeMillis();
+                long currentTime = System.currentTimeMillis();
+                dr.clear();
+                gameState.update((int) (GAME_DELAY_TIME + (currentTime - lastFrame) * TIME_PER_MS));
+                gameState.draw();
+                dr.show();
+                try {
+                    //Sleep for the next frame
+                    Thread.sleep(clamp((GAME_DELAY_TIME - (currentTime - lastFrame) * TIME_PER_MS) / TIME_PER_MS));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    //Interrupted so return
+                    state = -1;
+                }
+                dr.enableDoubleBuffering();
+                frame++;
+
+                if(System.currentTimeMillis() - time > 1000)
+                {
+                    FPS = frame;
+                    frame = 0;
+                    time = System.currentTimeMillis();
+                }
+                lastFrame = System.currentTimeMillis();
             }
-            lastFrame = System.currentTimeMillis();
+            dr.closeWindow();
         }
-        dr.closeWindow();
 	}
 
     public static long getFPS() {
@@ -170,5 +153,17 @@ public class StellarCrush {
 
     public static Draw getDraw() {
         return dr;
+    }
+
+    public static int getState() {
+        return state;
+    }
+
+    public static void setState(int state) {
+        StellarCrush.state = state;
+    }
+
+    public static MainKeyListener getListener() {
+        return listener;
     }
 }

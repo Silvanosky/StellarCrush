@@ -1,19 +1,19 @@
 import libs.Draw;
-import libs.StdDraw;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class PlayerObject extends GameObject implements IViewPort {
 
-    private static final Color DEFAULT_COLOR = StdDraw.WHITE;
-    private static final Color DEFAULT_FACING_COLOR = libs.StdDraw.BLACK;
+    private static final Color DEFAULT_COLOR = Draw.WHITE;
+    private static final Color DEFAULT_FACING_COLOR = Draw.BLACK;
     private static final double DEFAULT_FOV = Math.PI/2; // field of view of player's viewport
     private static final double FOV_INCREMENT = Math.PI/36; // rotation speed
 
     private Camera cam;
 
     private double yaw;
+
+    private int score = 0;
 
     public PlayerObject(Vector r, Vector v, double mass, double radius) {
         super(-1, r, v, mass, radius);
@@ -40,21 +40,20 @@ public class PlayerObject extends GameObject implements IViewPort {
             // No commands if no draw canvas to retrieve them from!
             Draw dr = cam.getDraw();
             if (dr != null) {
-
                 Vector direction = getFacingVector();
-                if (dr.isKeyPressed(KeyEvent.VK_UP))
+                if (StellarCrush.getListener().isUp())
                 {
                     setVelocity(getVelocity().plus(direction.times(100.0)));
                 }
-                if (dr.isKeyPressed(KeyEvent.VK_DOWN))
+                if (StellarCrush.getListener().isDown())
                 {
                     setVelocity(getVelocity().plus(direction.times(-100.0)));
                 }
 
                 //Rotation
-                if (dr.isKeyPressed(KeyEvent.VK_RIGHT))
+                if (StellarCrush.getListener().isRight())
                     yaw -= FOV_INCREMENT;
-                if (dr.isKeyPressed(KeyEvent.VK_LEFT))
+                if (StellarCrush.getListener().isLeft())
                     yaw += FOV_INCREMENT;
 
                 yaw = clampYaw(yaw);// -Pi -> Pi
@@ -63,10 +62,10 @@ public class PlayerObject extends GameObject implements IViewPort {
     }
 
     @Override
-    public void draw()
+    public void draw(Draw dr)
     {
         //Circle for direction
-        StellarCrush.getDraw().setPenColor(Color.RED);
+        dr.setPenColor(Color.RED);
         double rayon = getRadius() * SIZE * StellarCrush.scale;
         /*StdDraw.filledCircle( ,
                 getPosition().cartesian(1) + (Math.sin(yaw) * rayon),
@@ -87,9 +86,9 @@ public class PlayerObject extends GameObject implements IViewPort {
         x[2] = getPosition().cartesian(0) + (Math.cos(yaw) * (rayon + length));
         y[2] = getPosition().cartesian(1) + (Math.sin(yaw) * (rayon + length));
 
-        StellarCrush.getDraw().filledPolygon(x, y);
+        dr.filledPolygon(x, y);
 
-        super.draw();
+        super.draw(dr);
     }
 
     public Camera getCam() {
@@ -114,5 +113,15 @@ public class PlayerObject extends GameObject implements IViewPort {
     @Override
     public double getYaw() {
         return yaw;
+    }
+
+    @Override
+    public int getScore() {
+        return score;
+    }
+
+    public void incrementScore(int value)
+    {
+        score += value;
     }
 }
