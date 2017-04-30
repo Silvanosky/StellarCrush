@@ -265,8 +265,8 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         frame.setContentPane(draw);
         frame.addKeyListener(this);    // JLabel cannot get keyboard focus
         frame.setResizable(false);
-        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
+        //frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
         frame.setTitle(name);
         //frame.setJMenuBar(createMenuBar());
         frame.pack();
@@ -289,6 +289,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
     {
         if(frame != null)
         {
+            this.name = name;
             frame.setTitle(name);
         }
     }
@@ -309,6 +310,11 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
     public Point getLocationOnScreen()
     {
         return frame.getLocationOnScreen();
+    }
+
+    public void addKeyListener(KeyListener listener)
+    {
+        frame.addKeyListener(listener);
     }
 
     public void toFocus()
@@ -1410,4 +1416,28 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         draw2.text(0.8, 0.8, "white text");
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public double getXmin() {
+        return xmin;
+    }
+
+
+    public double getXmax() {
+        return xmax;
+    }
+
+    public double getYmin() {
+        return ymin;
+    }
+
+    public double getYmax() {
+        return ymax;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }

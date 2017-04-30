@@ -1,3 +1,5 @@
+import libs.RootMath;
+
 public class VectorUtil {
     // Class containing additional utility functions for working with vectors.
 
@@ -12,6 +14,11 @@ public class VectorUtil {
         // Returns direction of v, but sets angle to Math.PI/2 when v is the zero vector
 		// Used to avoid exception in Vector.java
         return null;
+    }
+
+    static Vector fastDir(Vector v)
+    {
+        return v.times(RootMath.invSqrtApprox(RootMath.sqrt((float) v.dot(v))));
     }
 
     //Check the distance between two vector without calling sqrt which have heavy complexity

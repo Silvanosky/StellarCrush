@@ -1,4 +1,6 @@
-import libs.StdDraw;
+
+
+import libs.Draw;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,9 +13,9 @@ public class GameState {
 
     static final double SPLIT_SPEED_MIN = 11000;
     static final double MERGE_SPEED_MAX = 0.013;
-    static final double MAX_ASTEROID_NUMBER = 100;
+    static final double MAX_ASTEROID_NUMBER = 500;
 
-    static final long TIME_PER_SPAWN = 3 * 1000;
+    static final long TIME_PER_SPAWN = 1 * 1000;
 
     private final Collection<GameObject> objects;
     private final PlayerObject player;
@@ -22,10 +24,13 @@ public class GameState {
 
     private long lastSpawnedAsteroid;
 
+    private Draw StdDraw = StellarCrush.getDraw();
+
     public GameState(PlayerObject player, double radius) {
         this.player = player;
+        double ratio = (double) StdDraw.getWidth() / StdDraw.getHeight();
         StdDraw.setXscale(-radius, +radius);
-        StdDraw.setYscale(-radius, +radius);
+        StdDraw.setYscale(-radius / ratio, +radius / ratio);
 
         StdDraw.changeWindowTitle("StellarCrush");
 
@@ -46,7 +51,7 @@ public class GameState {
         );*/
 
 
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 150; i++)
         {
            addGameObject(GameObjectLibrary.createAsteroidCircle(number++));
         }
@@ -61,7 +66,7 @@ public class GameState {
 
     private int checkIntegrity()
     {
-        ExecutorService taskExecutor = Executors.newFixedThreadPool(16);
+        ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
         Map<GameObject, Collection<GameObject>> collisions = calculateCollisions(taskExecutor);
         taskExecutor.shutdown();
         try{
@@ -113,7 +118,7 @@ public class GameState {
         //Input
         this.player.processCommand(delay);
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
+        ExecutorService taskExecutor = Executors.newWorkStealingPool();
         //Compute
         Map<GameObject, Vector> f = calculateForces(taskExecutor);
         Map<GameObject, Collection<GameObject>> collisions = calculateCollisions(taskExecutor);
@@ -123,26 +128,12 @@ public class GameState {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         for(Iterator<GameObject> ite = objects.iterator(); ite.hasNext(); )
         {
             GameObject object = ite.next();
 
             object.move(f.get(object), delay);
-
-            Vector position = object.getPosition();
-            Vector velocity = object.getVelocity();
-
-            if(Math.abs(position.cartesian(0)) > StellarCrush.scale)
-            {
-                double[] vec = {velocity.cartesian(0) * -1.0 , velocity.cartesian(1)};
-                object.setVelocity(new Vector(vec));
-            }
-
-            if(Math.abs(position.cartesian(1)) > StellarCrush.scale)
-            {
-                double[] vec = {velocity.cartesian(0), velocity.cartesian(1) * -1.0};
-                object.setVelocity(new Vector(vec));
-            }
         }
 
         //Physics
@@ -193,7 +184,59 @@ public class GameState {
         //System.out.println("Player speed: " + player.getVelocity().magnitude());
 
         //objects.removeIf(object -> !(object instanceof PlayerObject) && player.collideWith(object));
+        //Check in bounds
+        /*for(GameObject object : objects)
+            checkPosition(object);*/
+        checkPosition(player);
+
         processGamePlay();
+    }
+
+    public void checkPosition(GameObject object)
+    {
+        Vector position = object.getPosition();
+        Vector velocity = object.getVelocity();
+        double xmin = StellarCrush.getDraw().getXmin();
+        double xmax = StellarCrush.getDraw().getXmax();
+        double ymin = StellarCrush.getDraw().getYmin();
+        double ymax = StellarCrush.getDraw().getYmax();
+
+        if(position.cartesian(0) - object.getRealRadius() < xmin)
+        {
+            double[] vec = {velocity.cartesian(0) * -1.0 , velocity.cartesian(1)};
+            object.setVelocity(new Vector(vec));
+
+           /* double[] pos = {Math.abs(velocity.cartesian(1) - StdDraw.getXmin()), 0.0};
+            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
+        }
+
+        if(position.cartesian(0) + object.getRealRadius() > xmax)
+        {
+            double[] vec = {velocity.cartesian(0) * -1.0 , velocity.cartesian(1)};
+            object.setVelocity(new Vector(vec));
+
+            /*double[] pos = {-Math.abs(velocity.cartesian(1) - StdDraw.getXmax()), 0.0};
+            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
+        }
+
+
+        if(position.cartesian(1) - object.getRealRadius() < ymin)
+        {
+            double[] vec = {velocity.cartesian(0), velocity.cartesian(1) * -1.0};
+            object.setVelocity(new Vector(vec));
+
+           /* double[] pos = {0.0, Math.abs(velocity.cartesian(1) - StdDraw.getYmin())};
+            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
+        }
+
+        if(position.cartesian(1) + object.getRealRadius() > ymax)
+        {
+            double[] vec = {velocity.cartesian(0), velocity.cartesian(1) * -1.0};
+            object.setVelocity(new Vector(vec));
+
+            /*double[] pos = {0.0, -Math.abs(velocity.cartesian(1) - StdDraw.getYmax())};
+            object.setPosition(object.getPosition().plus(new Vector(pos)));*/
+        }
     }
 
     public void processGamePlay()
@@ -201,7 +244,9 @@ public class GameState {
         if(System.currentTimeMillis() - lastSpawnedAsteroid > TIME_PER_SPAWN)
         {
             if(objects.size() < MAX_ASTEROID_NUMBER) //We don't want to crash the game
-                addGameObject(GameObjectLibrary.createAsteroidRandom(number++));
+            {
+                addGameObject((Math.random() > 0.1) ? GameObjectLibrary.createAsteroidCircle(number++) : GameObjectLibrary.createBulltAsteroid(number++));
+            }
             lastSpawnedAsteroid = System.currentTimeMillis();
         }
     }
@@ -215,7 +260,6 @@ public class GameState {
         }
 
         for (GameObject i : this.objects) {
-
             for (GameObject j : this.objects) {
                 taskExecutor.execute(() -> {
                     if (i.getId() != j.getId()) {

@@ -7,9 +7,9 @@ public class GameObjectLibrary {
     // UNIVERSE CONSTANTS - TUNED BY HAND FOR RANDOM GENERATION
     private static final double ASTEROID_RADIUS = 0.5; // Location of asteroid belt for random initialization
     private static final double ASTEROID_WIDTH = 0.2; // Width of asteroid belt
-    private static final double ASTEROID_MIN_MASS = 1E24;
-    private static final double ASTEROID_MAX_MASS = 1E25;
-    private static final double PLAYER_MASS = 1E25;
+    private static final double ASTEROID_MIN_MASS = 1E22;
+    private static final double ASTEROID_MAX_MASS = 1E24;
+    private static final double PLAYER_MASS = 1E26;
 
     private static final double SQUARE_OF_TWO = Math.sqrt(2.0);
 
@@ -18,23 +18,38 @@ public class GameObjectLibrary {
     public static PlayerObject createPlayerObject()
     {
         double radius = 5.0 + random.nextDouble() * 5.0;
-        return new PlayerObject(new Vector(2), new Vector(2), PLAYER_MASS, 0.5);
+        return new PlayerObject(new Vector(2), new Vector(2), PLAYER_MASS, 0.05);
     }
 
     public static GameObject createAsteroidCircle(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
-        double radius = 1.0 + random.nextDouble() * 0.5;
+        double radius = random.nextDouble() * 2.01;
 
         double pos = random.nextDouble() * Math.PI * 2;
-        double distance = (ASTEROID_RADIUS * StellarCrush.scale)+ random.nextDouble() * ASTEROID_WIDTH ;
+        double distance = (ASTEROID_RADIUS * StellarCrush.scale)+ random.nextDouble() * ASTEROID_WIDTH * StellarCrush.scale ;
         double[] position = {Math.cos(pos)*distance, Math.sin(pos)*distance};
 
         /*double[] position = {(-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0,
                 (-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0};*/
 
         Vector r = new Vector(position);
-        Vector v = new Vector(new double[]{-1 + random.nextDouble() * 2.0, -1 + random.nextDouble() * 2.0}).times(25000);
+        Vector v = new Vector(new double[]{Math.sin(pos), -Math.cos(pos)}).times(1200);
+        return new GameObject(id, r, v, mass, radius);
+    }
+
+    public static GameObject createBulltAsteroid(int id)
+    {
+        double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
+        mass *= 2;
+        double radius = random.nextDouble() * 0.5;
+
+        double pos = random.nextDouble() * Math.PI * 2;
+        double distance = StellarCrush.scale;
+        double[] position = {Math.cos(pos)*distance, Math.sin(pos)*distance};
+
+        Vector r = new Vector(position);
+        Vector v = r.direction().times(-50000);
         return new GameObject(id, r, v, mass, radius);
     }
 
@@ -47,18 +62,17 @@ public class GameObjectLibrary {
                 (-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0};
 
         Vector r = new Vector(position);
-        Vector v = new Vector(new double[]{-1 + random.nextDouble() * 2.0, -1 + random.nextDouble() * 2.0}).times(50000);
+        Vector v = new Vector(new double[]{-1 + random.nextDouble() * 2.0, -1 + random.nextDouble() * 2.0}).times(5000);
         return new GameObject(id, r, v, mass, radius);
     }
 
     public static GameObject splitAsteroid(int id, GameObject gameObject)
     {
         double angle = random.nextDouble() * Math.PI * 2.0;
-        Vector vector = new Vector(new double[]{
-                Math.cos(angle) * (gameObject.getRadius()*2.0) * GameObject.SIZE * StellarCrush.scale,
-                Math.sin(angle) * (gameObject.getRadius()*2.0) * GameObject.SIZE * StellarCrush.scale});
-
         double radius = gameObject.getRadius();
+        Vector vector = new Vector(new double[]{
+                Math.cos(angle) * (radius*2.0) * GameObject.SIZE * StellarCrush.scale,
+                Math.sin(angle) * (radius*2.0) * GameObject.SIZE * StellarCrush.scale});
 
         GameObject cloned = new GameObject(id,
                 gameObject.getPosition().plus(vector),
@@ -71,8 +85,6 @@ public class GameObjectLibrary {
         gameObject.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
 
         cloned.setColor(gameObject.getColor());
-
-
 
         return cloned;
     }

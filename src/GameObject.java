@@ -1,5 +1,3 @@
-import libs.StdDraw;
-
 import java.awt.*;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,7 +26,7 @@ public class GameObject {
         this.r = r;
         this.v = v;
         this.mass = mass;
-        this.radius = Math.sqrt(mass / Math.PI) * Math.sqrt(radius);
+        this.radius = Math.sqrt((mass * radius) / Math.PI);
 
         Random random = new Random();
         this.color = new Color(random.nextFloat(),
@@ -46,15 +44,17 @@ public class GameObject {
 
     public Vector forceFrom(GameObject that) {
         Vector delta = that.r.minus(this.r);
-        double dist = delta.magnitude();
+        double dist = delta.dot(delta) + StellarCrush.softE * StellarCrush.softE;
 
-        double f = (StellarCrush.G * this.mass * that.mass) / ((dist + StellarCrush.softE) * (dist+ StellarCrush.softE));
-        return delta.direction().times(f);
+        double f = (StellarCrush.G * this.mass * that.mass) / dist;
+        return VectorUtil.fastDir(v).times(f);
+        //return delta.direction().times(f);
     }
 
     public void draw() {
-        StdDraw.setPenColor(color);
-        StdDraw.filledCircle(r.cartesian(0), r.cartesian(1), SIZE * radius* StellarCrush.scale);
+        StellarCrush.getDraw().setPenColor(color);
+        double v = SIZE * radius * StellarCrush.scale;
+        StellarCrush.getDraw().filledCircle(r.cartesian(0), r.cartesian(1), v);
     }
 
     static Vector collisionResult(double cr, //coefficient of restitution
@@ -159,6 +159,11 @@ public class GameObject {
 
     public double getRadius() {
         return radius;
+    }
+
+    public double getRealRadius()
+    {
+        return radius * SIZE * StellarCrush.scale;
     }
 
     public void setMass(double mass) {

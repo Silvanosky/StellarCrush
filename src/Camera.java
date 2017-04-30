@@ -1,6 +1,6 @@
 import libs.Draw;
 import libs.Entry;
-import libs.StdDraw;
+import libs.RootMath;
 
 import java.awt.*;
 import java.util.Collection;
@@ -20,11 +20,11 @@ public class Camera {
         this.holder = holder;
 
         dr = new Draw();
-        Point location = StdDraw.getLocationOnScreen();
+        Point location = StellarCrush.getDraw().getLocationOnScreen();
 
         setFOV(FOV);
 
-        dr.setLocationOnScreen(location.x + StdDraw.getWidth()+ 11, location.y);
+        dr.setLocationOnScreen(location.x + StellarCrush.getDraw().getWidth()+ 11, location.y);
         dr.toFocus();
     }
 
@@ -33,6 +33,16 @@ public class Camera {
         this.FOV = FOV;
         dr.setXscale(FOV/2.0, -FOV/2.0);
         dr.setYscale(-1.0, 1.0);
+    }
+
+    private double clampYaw(double yaw)
+    {
+        double nyaw = yaw;
+        if(yaw > Math.PI)
+            nyaw += -Math.PI * 2.0;
+        if(yaw < -Math.PI)
+            nyaw += Math.PI * 2.0;
+        return nyaw;
     }
 
 	void render(Collection<GameObject> objects) {
@@ -50,20 +60,26 @@ public class Camera {
 
             double deltaX = (position.cartesian(0) - location.cartesian(0)) / StellarCrush.scale;
             double deltaY = (position.cartesian(1) - location.cartesian(1)) / StellarCrush.scale;
-            double angle = Math.atan2(deltaY, deltaX) - holder.getYaw();
+            double angle = clampYaw(Math.atan2(deltaY, deltaX) - holder.getYaw());
 
-            if (Math.abs(angle) > FOV/2.0) {
+            if (Math.abs(angle) > FOV/2.0 + Math.PI / 12.0) {
                 continue;//Object out of view don't show it
             }
-            final double dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY) ;
+            final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
             renderer.add(new Entry<>(() -> {
                 double finalDist = dist;
                 if(finalDist * finalDist < 0.0001)
                     finalDist = 0.0001;
 
+                double radius =(GameObject.SIZE * obj.getRadius()) / finalDist;
+                double pos = Math.sin(angle);
+                dr.setPenColor(Color.RED);
+                dr.setPenRadius(radius * 1.01);
+                dr.point(pos, 0.0);
+
                 dr.setPenColor(obj.getColor());
-                dr.setPenRadius((GameObject.SIZE * obj.getRadius()) / finalDist);
-                dr.point(Math.sin(angle), 0.0);
+                dr.setPenRadius(radius);
+                dr.point(pos, 0.0);
 
             }, dist));
         }
@@ -74,7 +90,6 @@ public class Camera {
         }
         dr.show();
         dr.enableDoubleBuffering();
-
 	}
 
     public Draw getDraw() {

@@ -680,6 +680,11 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         }
     }
 
+    public static void addKeyListener(KeyListener listener)
+    {
+        frame.addKeyListener(listener);
+    }
+
     public static void changeWindowTitle(String name)
     {
         if(frame != null)
@@ -724,8 +729,23 @@ public final class StdDraw implements ActionListener, MouseListener, MouseMotion
         frame.toFront();
     }
 
+    public static double getXmin() {
+        return xmin;
+    }
 
-    /***************************************************************************
+    public static double getYmin() {
+        return ymin;
+    }
+
+    public static double getXmax() {
+        return xmax;
+    }
+
+    public static double getYmax() {
+        return ymax;
+    }
+
+/***************************************************************************
      *  User and screen coordinate systems.
      ***************************************************************************/
 

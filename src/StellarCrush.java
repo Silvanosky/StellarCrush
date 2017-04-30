@@ -30,7 +30,7 @@ MECHANICS/GAMEPLAY CHANGES:
 --https://github.com/phishman3579/java-algorithms-implementation/blob/master/src/com/jwetherell/algorithms/data_structures/QuadTree.java may also be useful - look at the Point Region Quadtree
 */
 
-import libs.StdDraw;
+import libs.Draw;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -44,48 +44,53 @@ public class StellarCrush {
 	static final int TIME_PER_MS = 1000; // how long in-game time corresponds to a real-time millisecond
 	static final double G = 6.67e-11; // gravitational constant
 	static final double softE = 0.001; // softening factor to avoid division by zero calculating force for co-located objects
-	static double scale = 5e10; // plotted universe size
+	static final double scale = 5e10; // plotted universe size
 
     private static long FPS = 0;
+
+    private static Draw dr;
+    private static MainKeyListener listener;
 
     private static void screen()
     {
         new File("screenshots").mkdir();
-        StdDraw.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
+        dr.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
     }
 
 	private static boolean menu()
 	{
-		StdDraw.setCanvasSize();
-		StdDraw.setXscale(0.0, 100.0);
-		StdDraw.setYscale(0.0, 100.0);
+        dr.setXscale(0.0, 100.0);
+        dr.setYscale(0.0, 100.0);
 
-		Font font = new Font("Arial", Font.BOLD, 45); 
-		StdDraw.setFont(font);
-		StdDraw.text(50.0, 90.0, "Stellar Crush");
-		StdDraw.setFont();
-		StdDraw.text(50.0, 80.0, "Press any Key to start!");
+		Font font = new Font("Arial", Font.BOLD, 45);
+        dr.setFont(font);
+        dr.text(50.0, 90.0, "Stellar Crush");
+        dr.setFont();
+        dr.text(50.0, 80.0, "Press any Key to start!");
 
-		StdDraw.text(50.0, 45.0, "Arrows to rotate left or roght, accelerate or decelerate");
+        dr.text(50.0, 45.0, "Arrows to rotate left or roght, accelerate or decelerate");
 
-		StdDraw.text(50.0, 35.0, "You are borg. Assimilate all who stand against you!");
+        dr.text(50.0, 35.0, "You are borg. Assimilate all who stand against you!");
 
-		libs.StdDraw.text(50.0, 20.0, "Quit (m). Screencap (p)");
-		
-		StdDraw.changeWindowTitle("StellarCrush");
+        dr.text(50.0, 20.0, "Quit (m). Screencap (p)");
+
+        dr.changeWindowTitle("StellarCrush");
+
 
 		try{
             while(true) {
                 //Key handle
-                if (StdDraw.isKeyPressed(KeyEvent.VK_M)) {
-                    if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+                if (dr.isKeyPressed(KeyEvent.VK_M)) {
+                    if(dr.hasNextKeyTyped())
+                        dr.nextKeyTyped();
                     return false;
-                } else if (StdDraw.isKeyPressed(KeyEvent.VK_P)) {
-                    if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+                } else if (dr.isKeyPressed(KeyEvent.VK_P)) {
+                    if(dr.hasNextKeyTyped())
+                        dr.nextKeyTyped();
                     screen();
-                } else if (StdDraw.hasNextKeyTyped()) {
-                    StdDraw.nextKeyTyped();    //Process key to avoid infinite loop
-                    StdDraw.closeWindow();
+                } else if (dr.hasNextKeyTyped()) {
+                    dr.nextKeyTyped();    //Process key to avoid infinite loop
+                    dr.closeWindow();
                     return true;
                 }
                 Thread.sleep(100);
@@ -93,7 +98,7 @@ public class StellarCrush {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            StdDraw.closeWindow();
+            dr.closeWindow();
         }
         return false;
 	}
@@ -105,40 +110,46 @@ public class StellarCrush {
         return value;
     }
 	public static void main(String[] args) {
+        dr = new Draw();
+        listener = new MainKeyListener();
+        dr.addListener(listener);
+
         if(!menu()) //
         {
             return;
         }
-        StdDraw.setCanvasSize(1024, 1024);
+        dr = new Draw();
+        dr.setCanvasSize(1024, 800);
         GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
         boolean run = true;
         long time = System.currentTimeMillis();
         long frame = 0;
+        long lastFrame = System.currentTimeMillis();
         while (run) // MAIN LOOP
         {
             long startTime = System.currentTimeMillis();
-            if (StdDraw.isKeyPressed(KeyEvent.VK_M)) {
-                if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+            if (dr.isKeyPressed(KeyEvent.VK_M)) {
+                if(dr.hasNextKeyTyped()) dr.nextKeyTyped();
                 run = false;
-            } else if (StdDraw.isKeyPressed(KeyEvent.VK_P)) {
-                if(StdDraw.hasNextKeyTyped()) StdDraw.nextKeyTyped();
+            } else if (dr.isKeyPressed(KeyEvent.VK_P)) {
+                if(dr.hasNextKeyTyped()) dr.nextKeyTyped();
                 screen();
             }
 
             long currentTime = System.currentTimeMillis();
-            StdDraw.clear();
-            gameState.update(GAME_DELAY_TIME);
+            dr.clear();
+            gameState.update((int) (GAME_DELAY_TIME + (currentTime - lastFrame) * TIME_PER_MS));
             gameState.draw();
-            StdDraw.show();
+            dr.show();
             try {
                 //Sleep for the next frame
-                Thread.sleep(clamp(GAME_DELAY_TIME / TIME_PER_MS - (currentTime - startTime) * TIME_PER_MS));
+                Thread.sleep(clamp((GAME_DELAY_TIME - (currentTime - startTime) * TIME_PER_MS) / TIME_PER_MS));
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 //Interrupted so return
                 run = false;
             }
-            StdDraw.enableDoubleBuffering();
+            dr.enableDoubleBuffering();
             frame++;
 
             if(System.currentTimeMillis() - time > 1000)
@@ -148,11 +159,16 @@ public class StellarCrush {
                 frame = 0;
                 time = System.currentTimeMillis();
             }
+            lastFrame = System.currentTimeMillis();
         }
-        StdDraw.closeWindow();
+        dr.closeWindow();
 	}
 
     public static long getFPS() {
         return FPS;
+    }
+
+    public static Draw getDraw() {
+        return dr;
     }
 }

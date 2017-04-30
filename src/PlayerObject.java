@@ -44,11 +44,11 @@ public class PlayerObject extends GameObject implements IViewPort {
                 Vector direction = getFacingVector();
                 if (dr.isKeyPressed(KeyEvent.VK_UP))
                 {
-                    setVelocity(getVelocity().plus(direction.times(50.0)));
+                    setVelocity(getVelocity().plus(direction.times(100.0)));
                 }
                 if (dr.isKeyPressed(KeyEvent.VK_DOWN))
                 {
-                    setVelocity(getVelocity().plus(direction.times(-50.0)));
+                    setVelocity(getVelocity().plus(direction.times(-100.0)));
                 }
 
                 //Rotation
@@ -66,7 +66,7 @@ public class PlayerObject extends GameObject implements IViewPort {
     public void draw()
     {
         //Circle for direction
-        StdDraw.setPenColor(Color.RED);
+        StellarCrush.getDraw().setPenColor(Color.RED);
         double rayon = getRadius() * SIZE * StellarCrush.scale;
         /*StdDraw.filledCircle( ,
                 getPosition().cartesian(1) + (Math.sin(yaw) * rayon),
@@ -87,7 +87,7 @@ public class PlayerObject extends GameObject implements IViewPort {
         x[2] = getPosition().cartesian(0) + (Math.cos(yaw) * (rayon + length));
         y[2] = getPosition().cartesian(1) + (Math.sin(yaw) * (rayon + length));
 
-        StdDraw.filledPolygon(x, y);
+        StellarCrush.getDraw().filledPolygon(x, y);
 
         super.draw();
     }
