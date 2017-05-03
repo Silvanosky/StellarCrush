@@ -104,6 +104,11 @@ public class StellarCrush {
     }
 
 	public static void main(String[] args) {
+
+        Rectangle screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+
         listener = new MainKeyListener();
 
         while (state != -1)
@@ -112,7 +117,7 @@ public class StellarCrush {
             menu();
             dr = createDraw();
 
-            dr.setCanvasSize(1024, 1024);
+            dr.setCanvasSize((int) (width * 0.55), (int) height);
             GameState gameState = new GameState(GameObjectLibrary.createPlayerObject(), scale);
             long time = System.currentTimeMillis();
             long frame = 0;

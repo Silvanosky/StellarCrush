@@ -19,33 +19,20 @@ public class Camera {
         // Constructs a camera with field of view FOV, held by holder, and rendered on canvas dr.
         this.holder = holder;
 
+        Rectangle screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+
         dr = StellarCrush.createDraw();
-        dr.setCanvasSize(780, 1024);
+        dr.setCanvasSize((int) (width * 0.45), (int) height);
         double ratio = (double) dr.getWidth() / dr.getHeight();
         dr.setXscale(100, 0);
         dr.setYscale(100.0/ratio, 0);
 
-        //dr.addListener(StellarCrush.getDraw());
         Point location = StellarCrush.getDraw().getLocationOnScreen();
         setFOV(FOV);
         dr.setLocationOnScreen(location.x + StellarCrush.getDraw().getWidth(), location.y);
-        //dr.setLocationOnScreen(location.x, location.y + StellarCrush.getDraw().getHeight() + 35);
         dr.toFocus();
-    }
-
-    public void setFOV(double FOV)
-    {
-        this.FOV = FOV;
-    }
-
-    private double clampYaw(double yaw)
-    {
-        double nyaw = yaw;
-        if(yaw > Math.PI)
-            nyaw += -Math.PI * 2.0;
-        if(yaw < -Math.PI)
-            nyaw += Math.PI * 2.0;
-        return nyaw;
     }
 
 	void render(Collection<GameObject> objects) {
@@ -58,31 +45,28 @@ public class Camera {
             if(holder.getId() == obj.getId())
                 continue;
 
-            Vector position = obj.getPosition();
+            Vector position = obj.getLocation();
             Vector location = holder.getLocation();
 
             double deltaX = (position.cartesian(0) - location.cartesian(0)) / StellarCrush.scale;
             double deltaY = (position.cartesian(1) - location.cartesian(1)) / StellarCrush.scale;
             double angle = clampYaw(Math.atan2(deltaY, deltaX) - holder.getYaw());
 
-            if (Math.abs(angle) > FOV/2.0 + Math.PI / 12.0) {
-                continue;//Object out of view don't show it
+            if (Math.abs(angle) < FOV/2.0 + Math.PI / 12.0) { // Don't compute out of range objects
+                final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
+                renderer.add(new Entry<>(() -> {
+                    double radius =(GameObject.SIZE * obj.getRadius()) / dist;
+                    double posx = Math.sin(angle);
+                    double posy = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
+                    dr.setPenColor(Color.RED);
+                    dr.setPenRadius(radius * 1.01);
+                    dr.point(scaleX(posx), posy);
+
+                    dr.setPenColor(obj.getColor());
+                    dr.setPenRadius(radius);
+                    dr.point(scaleX(posx), posy);
+                }, dist));
             }
-            final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
-            renderer.add(new Entry<>(() -> {
-                double finalDist = dist;
-                double radius =(GameObject.SIZE * obj.getRadius()) / finalDist;
-                double posx = Math.sin(angle);
-                double posy = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
-                dr.setPenColor(Color.RED);
-                dr.setPenRadius(radius * 1.01);
-                dr.point(scaleX(posx), posy);
-
-                dr.setPenColor(obj.getColor());
-                dr.setPenRadius(radius);
-                dr.point(scaleX(posx), posy);
-
-            }, dist));
         }
 
         while (!renderer.isEmpty())
@@ -116,9 +100,9 @@ public class Camera {
             v1 = 0.0;
         }
         double velocity = Math.atan2(v, v1);
-        drawTriangle(dr, Color.BLACK, ox, oy, 3, 2, Math.PI/6, velocity);
+        drawTriangle(dr, Color.BLACK, ox, oy, velocity);
 
-        drawTriangle(dr, Color.RED, ox, oy, 3, 2, Math.PI/6, yaw);
+        drawTriangle(dr, Color.RED, ox, oy, yaw);
 
         dr.setPenColor(holder.getColor());
         dr.setPenRadius(0.1);
@@ -130,12 +114,11 @@ public class Camera {
 
     }
 
-    public Draw getDraw() {
-        return dr;
-    }
+    private void drawTriangle(Draw dr, Color color,  double ox, double oy, double yaw) {
+        double rayon = 3.0;
+        double length = 2.0;
+        double width = Math.PI / 6.0;
 
-    private void drawTriangle(Draw dr, Color color,  double ox, double oy, double rayon, double length, double width, double yaw)
-    {
         dr.setPenColor(color);
         double[] x = new double[3];//Not the choice with stddraw so need to use array
         double[] y = new double[3];
@@ -151,6 +134,27 @@ public class Camera {
         dr.filledPolygon(x, y);
     }
 
+    //Utils
     private double  scaleX(double x) { return 100  * (x + FOV/2.0) / FOV; }
     private double  scaleY(double y) { return dr.getYmin() * y / 100; }
+
+    private double clampYaw(double yaw)
+    {
+        double nyaw = yaw;
+        if(yaw > Math.PI)
+            nyaw += -Math.PI * 2.0;
+        if(yaw < -Math.PI)
+            nyaw += Math.PI * 2.0;
+        return nyaw;
+    }
+
+    //Getters/Setters
+    public void setFOV(double FOV)
+    {
+        this.FOV = FOV;
+    }
+
+    public Draw getDraw() {
+        return dr;
+    }
 }

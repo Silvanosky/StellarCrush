@@ -67,9 +67,6 @@ public class PlayerObject extends GameObject implements IViewPort {
         //Circle for direction
         dr.setPenColor(Color.RED);
         double rayon = getRadius() * SIZE * StellarCrush.scale;
-        /*StdDraw.filledCircle( ,
-                getPosition().cartesian(1) + (Math.sin(yaw) * rayon),
-                0.015 * StellarCrush.scale);*/
 
         double length = 0.018 * StellarCrush.scale;
         double width = Math.PI/12;
@@ -77,14 +74,14 @@ public class PlayerObject extends GameObject implements IViewPort {
         double[] x = new double[3];//Not the choice with stddraw so need to use array
         double[] y = new double[3];
 
-        x[0] = getPosition().cartesian(0) + (Math.cos(yaw - width) * rayon);
-        y[0] = getPosition().cartesian(1) + (Math.sin(yaw - width) * rayon);
+        x[0] = getLocation().cartesian(0) + (Math.cos(yaw - width) * rayon);
+        y[0] = getLocation().cartesian(1) + (Math.sin(yaw - width) * rayon);
 
-        x[1] = getPosition().cartesian(0) + (Math.cos(yaw + width) * rayon);
-        y[1] = getPosition().cartesian(1) + (Math.sin(yaw + width) * rayon);
+        x[1] = getLocation().cartesian(0) + (Math.cos(yaw + width) * rayon);
+        y[1] = getLocation().cartesian(1) + (Math.sin(yaw + width) * rayon);
 
-        x[2] = getPosition().cartesian(0) + (Math.cos(yaw) * (rayon + length));
-        y[2] = getPosition().cartesian(1) + (Math.sin(yaw) * (rayon + length));
+        x[2] = getLocation().cartesian(0) + (Math.cos(yaw) * (rayon + length));
+        y[2] = getLocation().cartesian(1) + (Math.sin(yaw) * (rayon + length));
 
         dr.filledPolygon(x, y);
 
@@ -93,11 +90,6 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     public Camera getCam() {
         return cam;
-    }
-
-    @Override
-    public Vector getLocation() {
-        return this.getPosition();
     }
 
     @Override

@@ -26,7 +26,7 @@ public class GameState {
 
     private Draw StdDraw = StellarCrush.getDraw();
 
-    public GameState(PlayerObject player, double radius) {
+    GameState(PlayerObject player, double radius) {
         this.player = player;
         double ratio = (double) StdDraw.getWidth() / StdDraw.getHeight();
         StdDraw.setXscale(-radius, +radius);
@@ -36,21 +36,6 @@ public class GameState {
 
         this.objects = new LinkedList<>();
 
-        /*addGameObject(new GameObject(number++,
-                new Vector(new double[]{ radius/2.0, radius/2.0 }),
-                new Vector(new double[]{ -15300, -15000}),
-                1e24,
-                1)
-        );
-
-        addGameObject(new GameObject(number++,
-                new Vector(new double[]{ 0.0, -radius/2.0 }),
-                new Vector(new double[]{ 0.0, 18000}),
-                1e24,
-                1)
-        );*/
-
-
         for (int i = 0; i < 150; i++)
         {
            addGameObject(GameObjectLibrary.createAsteroidCircle(number++));
@@ -58,15 +43,23 @@ public class GameState {
         addGameObject(player);
         lastSpawnedAsteroid = System.currentTimeMillis();
 
-        while(checkIntegrity() != 0) //Gameplay arrangement before start
-        {
+        while(checkIntegrity() != 0); //Gameplay arrangement before start
 
-        }
+    }
+
+    private synchronized void addGameObject(GameObject object)
+    {
+        this.objects.add(object);
+    }
+
+    private synchronized void removeGameObject(GameObject object)
+    {
+        this.objects.remove(object);
     }
 
     private int checkIntegrity()
     {
-        ExecutorService taskExecutor = Executors.newFixedThreadPool(4);
+        ExecutorService taskExecutor = Executors.newWorkStealingPool();
         Map<GameObject, Collection<GameObject>> collisions = calculateCollisions(taskExecutor);
         taskExecutor.shutdown();
         try{
@@ -85,33 +78,11 @@ public class GameState {
                 collisions.get(b).remove(a);
 
                 a.applyCollide(b);
-
-                //Avoid merge of player
-                if(a instanceof PlayerObject)
-                {
-                    removeGameObject(b);
-                    continue;
-                }
-                if(b instanceof PlayerObject)
-                {
-                    removeGameObject(a);
-                    continue;
-                }
                 GameObjectLibrary.mergeAsteroid(a, b);
                 removeGameObject(b);
             }
         }
         return i;
-    }
-
-    public synchronized void addGameObject(GameObject object)
-    {
-        this.objects.add(object);
-    }
-
-    public synchronized void removeGameObject(GameObject object)
-    {
-        this.objects.remove(object);
     }
 
     synchronized void update(int delay) {
@@ -129,10 +100,8 @@ public class GameState {
             e.printStackTrace();
         }
 
-        for(Iterator<GameObject> ite = objects.iterator(); ite.hasNext(); )
+        for(GameObject object : this.objects)
         {
-            GameObject object = ite.next();
-
             object.move(f.get(object), delay);
         }
 
@@ -141,49 +110,23 @@ public class GameState {
         {
             GameObject object = entry.getKey();
             Collection<GameObject> collides = entry.getValue();
-            if(object instanceof PlayerObject)
+
+            for(GameObject object1 : collides)
             {
-                for (GameObject object1 : collides)
+                collisions.get(object1).remove(object);
+
+                object.applyCollide(object1);
+                if(object instanceof PlayerObject)
                 {
-                    player.applyCollide(object1);
                     removeGameObject(object1);
-                }
-            }else {
-                for(GameObject object1 : collides)
+                }else if(object1 instanceof PlayerObject)
                 {
-                    collisions.get(object1).remove(object);
-
-                    object.applyCollide(object1);
-
-                    //Avoid merge of player
-                    if(object1 instanceof PlayerObject)
-                    {
-                        removeGameObject(object);
-                    }else {
-                        if(VectorUtil.distanceMinusTo(object.getVelocity(), object1.getVelocity(), MERGE_SPEED_MAX)
-                                || VectorUtil.distanceMinusTo(object.getPosition(), object1.getPosition(),
-                                (object.getRadius() + object1.getRadius()) * GameObject.SIZE * StellarCrush.scale/2.0))
-                        {
-                            GameObjectLibrary.mergeAsteroid(object, object1);
-                            removeGameObject(object1);
-                        }
-                        if(VectorUtil.distanceMaxTo(object.getVelocity(), object1.getVelocity(), SPLIT_SPEED_MIN)) {
-
-                            GameObject toSplit = object1;
-
-                            if(object.getRadius() > object1.getRadius())
-                                toSplit = object;
-                            addGameObject(GameObjectLibrary.splitAsteroid(number++, toSplit));
-                        }
-                    }
-
-
+                    removeGameObject(object);
+                }else {
+                    processCollisions(object, object1);
                 }
             }
         }
-        //System.out.println("Player speed: " + player.getVelocity().magnitude());
-
-        //objects.removeIf(object -> !(object instanceof PlayerObject) && player.collideWith(object));
         //Check in bounds
         /*for(GameObject object : objects)
             checkPosition(object);*/
@@ -192,9 +135,30 @@ public class GameState {
         processGamePlay();
     }
 
-    public void checkPosition(GameObject object)
+    //Process merge or split depending on environment
+    private void processCollisions(GameObject object, GameObject object1)
     {
-        Vector position = object.getPosition();
+        if(VectorUtil.distanceMinusTo(object.getVelocity(), object1.getVelocity(), MERGE_SPEED_MAX)
+                || VectorUtil.distanceMinusTo(object.getLocation(), object1.getLocation(),
+                (object.getRadius() + object1.getRadius()) * GameObject.SIZE * StellarCrush.scale/2.0))
+        {
+            GameObjectLibrary.mergeAsteroid(object, object1);
+            removeGameObject(object1);
+        }
+        if(VectorUtil.distanceMaxTo(object.getVelocity(), object1.getVelocity(), SPLIT_SPEED_MIN)) {
+
+            GameObject toSplit = object1;
+
+            if(object.getRadius() > object1.getRadius())
+                toSplit = object;
+            addGameObject(GameObjectLibrary.splitAsteroid(number++, toSplit));
+        }
+    }
+
+    //Check position of an object and bounce him if out
+    private void checkPosition(GameObject object)
+    {
+        Vector position = object.getLocation();
         Vector velocity = object.getVelocity();
         double xmin = StellarCrush.getDraw().getXmin();
         double xmax = StellarCrush.getDraw().getXmax();
@@ -227,7 +191,8 @@ public class GameState {
         }
     }
 
-    public void processGamePlay()
+    //Gameplay
+    private void processGamePlay()
     {
         if(System.currentTimeMillis() - lastSpawnedAsteroid > TIME_PER_SPAWN)
         {

@@ -17,21 +17,17 @@ public class GameObjectLibrary {
 
     public static PlayerObject createPlayerObject()
     {
-        double radius = 5.0 + random.nextDouble() * 5.0;
         return new PlayerObject(new Vector(2), new Vector(2), PLAYER_MASS, 0.05);
     }
 
     public static GameObject createAsteroidCircle(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
-        double radius = random.nextDouble() * 3.0;
+        double radius = 2.0 + random.nextDouble() * 1.0;
 
         double pos = random.nextDouble() * Math.PI * 2;
         double distance = (ASTEROID_RADIUS * StellarCrush.scale)+ random.nextDouble() * ASTEROID_WIDTH * StellarCrush.scale ;
         double[] position = {Math.cos(pos)*distance, Math.sin(pos)*distance};
-
-        /*double[] position = {(-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0,
-                (-1.0 * StellarCrush.scale) + random.nextDouble() * StellarCrush.scale * 2.0};*/
 
         Vector r = new Vector(position);
         Vector v = new Vector(new double[]{Math.sin(pos), -Math.cos(pos)}).times(2200);
@@ -42,7 +38,7 @@ public class GameObjectLibrary {
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
         mass *= 2;
-        double radius = random.nextDouble() * 2.0;
+        double radius = 1.5 + random.nextDouble() * 0.5;
 
         double pos = random.nextDouble() * Math.PI * 2;
         double distance = StellarCrush.scale;
@@ -75,7 +71,7 @@ public class GameObjectLibrary {
                 Math.sin(angle) * (radius*2.0) * GameObject.SIZE * StellarCrush.scale});
 
         GameObject cloned = new GameObject(id,
-                gameObject.getPosition().plus(vector),
+                gameObject.getLocation().plus(vector),
                 gameObject.getVelocity(),
                 gameObject.getMass()/2.0,
                 42.0);
@@ -94,6 +90,8 @@ public class GameObjectLibrary {
         a.setMass(a.getMass() + b.getMass());
         a.setRadius(Math.sqrt(a.getRadius() * a.getRadius() + b.getRadius() * b.getRadius()));
         a.setVelocity(a.getVelocity().plus(b.getVelocity()).times(0.5));
-        a.setPosition(a.getPosition().plus(b.getPosition()).times(0.5));
+
+        Vector position = (a.getRadius() > b.getRadius())?a.getLocation():b.getLocation();
+        a.setLocation(position);
     }
 }

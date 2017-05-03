@@ -241,6 +241,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
 
         frame = new JFrame();
         frame.setUndecorated(undecorated);
+
         offscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         onscreenImage  = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         offscreen = offscreenImage.createGraphics();

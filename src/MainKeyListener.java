@@ -17,11 +17,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MainKeyListener implements libs.DrawListener {
 
-    private AtomicBoolean up = new AtomicBoolean();
-    private AtomicBoolean down = new AtomicBoolean();
-    private AtomicBoolean left = new AtomicBoolean();
-    private AtomicBoolean right = new AtomicBoolean();
-    private AtomicBoolean space = new AtomicBoolean();
+    private boolean up;
+    private boolean down;
+    private boolean left;
+    private boolean right;
+    private boolean space;
 
     private final Object keyLock = new Object();
 
@@ -55,19 +55,19 @@ public class MainKeyListener implements libs.DrawListener {
         switch (keycode)
         {
             case KeyEvent.VK_UP:
-                up.set(true);
+                up = true;
                 break;
             case KeyEvent.VK_DOWN:
-                down.set(true);
+                down = true;
                 break;
             case KeyEvent.VK_LEFT:
-                left.set(true);
+                left = true;
                 break;
             case KeyEvent.VK_RIGHT:
-                right.set(true);
+                right = true;
                 break;
             case KeyEvent.VK_SPACE:
-                space.set(true);
+                space = true;
                 break;
             case KeyEvent.VK_M:
             case KeyEvent.VK_ESCAPE:
@@ -92,19 +92,19 @@ public class MainKeyListener implements libs.DrawListener {
         switch (keycode)
         {
             case KeyEvent.VK_UP:
-                up.set(false);
+                up = false;
                 break;
             case KeyEvent.VK_DOWN:
-                down.set(false);
+                down = false;
                 break;
             case KeyEvent.VK_LEFT:
-                left.set(false);
+                left = false;
                 break;
             case KeyEvent.VK_RIGHT:
-                right.set(false);
+                right = false;
                 break;
             case KeyEvent.VK_SPACE:
-                space.set(false);
+                space = false;
                 break;
             default:
                 break;
@@ -112,22 +112,22 @@ public class MainKeyListener implements libs.DrawListener {
     }
 
     public boolean isUp() {
-        return up.get();
+        return up;
     }
 
     public boolean isDown() {
-        return down.get();
+        return down;
     }
 
     public boolean isLeft() {
-        return left.get();
+        return left;
     }
 
     public boolean isRight() {
-        return right.get();
+        return right;
     }
 
     public boolean isSpace() {
-        return space.get();
+        return space;
     }
 }
