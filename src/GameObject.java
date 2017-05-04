@@ -5,7 +5,7 @@ import java.util.Random;
 
 
 public class GameObject {
-    private int id;
+    private final int id;
 
     private Vector loc; // position
     private Vector velocity; // velocity

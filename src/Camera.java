@@ -1,5 +1,5 @@
 import libs.Draw;
-import libs.Entry;
+import libs.IEntry;
 import libs.RootMath;
 
 import java.awt.*;
@@ -41,7 +41,7 @@ public class Camera {
         dr.clear();
 
         //Use this queue to first
-        PriorityQueue<Entry<Runnable, Double>> renderer = new PriorityQueue<>((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
+        PriorityQueue<IEntry<Runnable, Double>> renderer = new PriorityQueue<>((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
 
         for(GameObject obj : objects) {
             if(holder.getId() == obj.getId())
@@ -56,17 +56,17 @@ public class Camera {
 
             if (Math.abs(angle) < FOV/2.0 + Math.PI / 12.0) { // Don't compute out of range objects
                 final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
-                renderer.add(new Entry<>(() -> {
+                renderer.add(new IEntry<>(() -> {
                     double radius =(GameObject.SIZE * obj.getRadius()) / dist;
-                    double posx = Math.sin(angle);
-                    double posy = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
+                    double posX = Math.sin(angle);
+                    double posY = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
                     dr.setPenColor(Color.RED);
                     dr.setPenRadius(radius * 1.01);
-                    dr.point(scaleX(posx), posy);
+                    dr.point(scaleX(posX), posY);
 
                     dr.setPenColor(obj.getColor());
                     dr.setPenRadius(radius);
-                    dr.point(scaleX(posx), posy);
+                    dr.point(scaleX(posX), posY);
                 }, dist));
             }
         }
@@ -89,7 +89,8 @@ public class Camera {
             percent = 99;
         }
 
-        int r, g;
+        int r;
+        int g;
         if (percent < 50) {
             // green to yellow
             r = 255 * (percent / 50);
@@ -157,16 +158,16 @@ public class Camera {
 
         Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox + (Math.cos(yaw - width) * rayon),
                 oy + (Math.sin(yaw - width) * rayon)
         ));
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox + (Math.cos(yaw + width) * rayon),
                 oy + (Math.sin(yaw + width) * rayon)
         ));
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox + (Math.cos(yaw) * (rayon + length)),
                 oy + (Math.sin(yaw) * (rayon + length))
         ));
@@ -185,21 +186,21 @@ public class Camera {
 
         Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox,
                 scaleY(oy)
         ));
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox - width,
                 scaleY(oy)
         ));
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox - width,
                 scaleY(oy + height)
         ));
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 ox,
                 scaleY(oy + height)
         ));
@@ -215,12 +216,12 @@ public class Camera {
 
     private double clampYaw(double yaw)
     {
-        double nyaw = yaw;
+        double nam = yaw;
         if(yaw > Math.PI)
-            nyaw += -Math.PI * 2.0;
+            nam += -Math.PI * 2.0;
         if(yaw < -Math.PI)
-            nyaw += Math.PI * 2.0;
-        return nyaw;
+            nam += Math.PI * 2.0;
+        return nam;
     }
 
     //Getters/Setters

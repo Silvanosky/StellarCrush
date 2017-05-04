@@ -1,5 +1,4 @@
 import java.awt.event.KeyEvent;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * ╱╲＿＿＿＿＿＿╱╲
@@ -23,30 +22,29 @@ public class MainKeyListener implements libs.DrawListener {
     private boolean right;
     private boolean space;
 
-    private final Object keyLock = new Object();
-
     public MainKeyListener()
     {
-
+        //Empty constructor
     }
 
     @Override
     public void mousePressed(double x, double y) {
-
+        //not used
     }
 
     @Override
     public void mouseDragged(double x, double y) {
-
+        //not used
     }
 
     @Override
     public void mouseReleased(double x, double y) {
-
+        //not used
     }
 
     @Override
     public void keyTyped(int keycode) {
+        //not used
     }
 
     @Override

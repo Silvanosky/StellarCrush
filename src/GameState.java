@@ -24,7 +24,7 @@ public class GameState {
 
     private long lastSpawnedAsteroid;
 
-    private Draw StdDraw = StellarCrush.getDraw();
+    private final Draw StdDraw = StellarCrush.getDraw();
 
     GameState(PlayerObject player, double radius) {
         this.player = player;
@@ -64,8 +64,8 @@ public class GameState {
         taskExecutor.shutdown();
         try{
             taskExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ignored) {
+            ignored.printStackTrace();
         }
         int i = 0;
         for(Map.Entry<GameObject, Collection<GameObject>> entry : collisions.entrySet())
@@ -200,7 +200,7 @@ public class GameState {
         {
             if(objects.size() < MAX_ASTEROID_NUMBER) //We don't want to crash the game
             {
-                addGameObject((Math.random() > 0.05) ? GameObjectLibrary.createAsteroidCircle(number++) : GameObjectLibrary.createBulltAsteroid(number++));
+                addGameObject((Math.random() > 0.05) ? GameObjectLibrary.createAsteroidCircle(number++) : GameObjectLibrary.createBulletAsteroid(number++));
             }
             lastSpawnedAsteroid = System.currentTimeMillis();
         }

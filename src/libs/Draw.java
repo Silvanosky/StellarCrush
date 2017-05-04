@@ -203,8 +203,8 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
     private double mouseY = 0;
 
     // keyboard state
-    private final LinkedList<Character> keysTyped = new LinkedList<Character>();
-    private final TreeSet<Integer> keysDown = new TreeSet<Integer>();
+    private final LinkedList<Character> keysTyped = new LinkedList<>();
+    private final TreeSet<Integer> keysDown = new TreeSet<>();
 
     // event-based listeners
     private final ArrayList<DrawListener> listeners = new ArrayList<>();
@@ -272,7 +272,7 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         frame.setContentPane(draw);
         frame.addKeyListener(this);    // JLabel cannot get keyboard focus
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);            // closes all windows
         //frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
         frame.setTitle(name);
         //frame.setJMenuBar(createMenuBar());

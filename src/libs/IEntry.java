@@ -16,12 +16,12 @@ import java.util.Map;
  * ＿＿╱▕▔▔▏╲＿＿
  * ＿＿▔▔＿＿▔▔＿＿
  */
-public class Entry<K, V> implements Map.Entry<K, V> {
+public class IEntry<K, V> implements Map.Entry<K, V> {
 
-    private K key;
+    private final K key;
     private V value;
 
-    public Entry(K key, V value) {
+    public IEntry(K key, V value) {
         this.key = key;
         this.value = value;
     }

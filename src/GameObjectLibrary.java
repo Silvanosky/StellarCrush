@@ -15,6 +15,11 @@ public class GameObjectLibrary {
 
     private static final Random random = new Random(0);
 
+    private GameObjectLibrary()
+    {
+
+    }
+
     public static PlayerObject createPlayerObject()
     {
         return new PlayerObject(new Vector(2), new Vector(2), PLAYER_MASS, 0.05);
@@ -34,7 +39,7 @@ public class GameObjectLibrary {
         return new GameObject(id, r, v, mass, radius);
     }
 
-    public static GameObject createBulltAsteroid(int id)
+    public static GameObject createBulletAsteroid(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
         mass *= 2;
@@ -76,7 +81,7 @@ public class GameObjectLibrary {
                 gameObject.getMass()/2.0,
                 42.0);
         cloned.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
-        cloned.updatePoint();;
+        cloned.updatePoint();
 
         gameObject.setMass(gameObject.getMass()/2.0);
         gameObject.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);

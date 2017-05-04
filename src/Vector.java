@@ -40,8 +40,7 @@ public class Vector {
 
         // defensive copy so that client can't alter our copy of data[]
         this.data = new double[N];
-        for (int i = 0; i < N; i++)
-            this.data[i] = data[i];
+        System.arraycopy(data, 0, this.data, 0, N);
     }
 
     // create a vector from either an array or a vararg list
@@ -124,29 +123,11 @@ public class Vector {
 
     // return a string representation of the vector
     public String toString() {
-        String s = "(";
+        StringBuilder s = new StringBuilder("(");
         for (int i = 0; i < N; i++) {
-            s += data[i];
-            if (i < N-1) s+= ", "; 
+            s.append(Double.toString(data[i]));
+            if (i < N-1) s.append(", ");
         }
         return s + ")";
-    }
-
-
-    // test client
-    public static void main(String[] args) {
-        double[] xdata = { 1.0, 2.0, 3.0, 4.0 };
-        double[] ydata = { 5.0, 2.0, 4.0, 1.0 };
-
-        Vector x = new Vector(xdata);
-        Vector y = new Vector(ydata);
-
-        System.out.println("x        =  " + x);
-        System.out.println("y        =  " + y);
-        System.out.println("x + y    =  " + x.plus(y));
-        System.out.println("10x      =  " + x.times(10.0));
-        System.out.println("|x|      =  " + x.magnitude());
-        System.out.println("<x, y>   =  " + x.dot(y));
-        System.out.println("|x - y|  =  " + x.minus(y).magnitude());
     }
 }

@@ -1,5 +1,5 @@
 import libs.Draw;
-import libs.Entry;
+import libs.IEntry;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -102,16 +102,16 @@ public class PlayerObject extends GameObject implements IViewPort {
 
         Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 getLocation().cartesian(0) + (Math.cos(yaw - width) * rayon),
                 getLocation().cartesian(1) + (Math.sin(yaw - width) * rayon)
         ));
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 getLocation().cartesian(0) + (Math.cos(yaw + width) * rayon),
                 getLocation().cartesian(1) + (Math.sin(yaw + width) * rayon)
         ));
 
-        points.add(new Entry<>(
+        points.add(new IEntry<>(
                 getLocation().cartesian(0) + (Math.cos(yaw) * (rayon + length)),
                 getLocation().cartesian(1) + (Math.sin(yaw) * (rayon + length))
         ));

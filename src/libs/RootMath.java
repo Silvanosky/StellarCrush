@@ -13,10 +13,15 @@ package libs;
  */
 public class RootMath {
 
+    private RootMath()
+    {
+
+    }
+
     /**
      * Accurate approximation for the inverse (reciprocal) of a floating-point square root.
      *
-     * @param number
+     * @param f
      * @return float square root
      */
     public static float invSqrt(float f) {
@@ -28,7 +33,7 @@ public class RootMath {
     /**
      * Rough approximation for the inverse (reciprocal) of a floating-point square root.
      *
-     * @param number
+     * @param f
      * @return float square root
      */
     public static float invSqrtApprox(float f) {
@@ -39,7 +44,7 @@ public class RootMath {
      * Accurate approximation for a floating-point square root.
      * Roughly 1.2x as fast as java.lang.Math.sqrt(x);
      *
-     * @param number
+     * @param f
      * @return float square root
      */
     public static float sqrt(float f) {
@@ -54,7 +59,7 @@ public class RootMath {
      * Semi-Accurate approximation for a floating-point square root.
      * Roughly 1.4x as fast as java.lang.Math.sqrt(x);
      *
-     * @param number
+     * @param f
      * @return float square root
      */
     public static float sqrtSemi(float f) {
@@ -67,7 +72,7 @@ public class RootMath {
      * Approximation for a floating-point square root.
      * This method is not very accurate past two digits, but up to 2.4 times as fast as java.lang.Math.sqrt(x);
      *
-     * @param number
+     * @param f
      * @return float square root approximation
      */
     public static float sqrtApprox(float f) {
