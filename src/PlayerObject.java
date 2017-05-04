@@ -49,8 +49,16 @@ public class PlayerObject extends GameObject implements IViewPort {
             point *= -1;
 
         score += point;
-        if(score >= 100) // TODO FINISH GAME
+
+        //Game over
+        if(score >= 100) {
             score = 100;
+            StellarCrush.setState(2);
+        }
+        if(score <= 0) {
+            score = 0;
+            StellarCrush.setState(2);
+        }
     }
 
     //@Override
@@ -140,5 +148,10 @@ public class PlayerObject extends GameObject implements IViewPort {
     public void incrementScore(int value)
     {
         score += value;
+    }
+
+    public void close() {
+        cam.close();
+        cam = null;
     }
 }

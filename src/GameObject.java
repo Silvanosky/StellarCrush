@@ -26,7 +26,7 @@ public class GameObject {
         this.mass = mass;
         this.radius = Math.sqrt((mass * radius) / Math.PI);
 
-        updatePoint(GameObjectLibrary.ASTEROID_MAX_MASS);
+        updatePoint();
 
         Random random = GameObjectLibrary.getRandom();
         this.color = new Color(random.nextFloat(),
@@ -80,9 +80,10 @@ public class GameObject {
         return VectorUtil.distanceMinusTo(position, this.loc, (object.getRadius() + this.radius) * SIZE * StellarCrush.scale);
     }
 
-    public void updatePoint(double max)
+    public void updatePoint()
     {
-        this.points = (int) ((mass / max) * 2);
+        //Math.log(GameObjectLibrary.ASTEROID_MIN_MASS) = 22
+        new Thread(() -> points = (int) ((Math.log(mass) - Math.log(GameObjectLibrary.ASTEROID_MIN_MASS)))).start();
     }
 
     public int getId() {

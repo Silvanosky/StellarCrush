@@ -232,4 +232,8 @@ public class Camera {
     public Draw getDraw() {
         return dr;
     }
+
+    public void close() {
+        dr.closeWindow();
+    }
 }

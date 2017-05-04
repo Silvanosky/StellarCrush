@@ -261,4 +261,11 @@ public class GameState {
         new Thread(() -> player.getCam().render(objects)).start();
     }
 
+    public PlayerObject getPlayer() {
+        return player;
+    }
+
+    public void close() {
+        player.close();
+    }
 }
