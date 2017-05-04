@@ -118,9 +118,11 @@ public class GameState {
                 object.applyCollide(object1);
                 if(object instanceof PlayerObject)
                 {
+                    player.eat(object1);
                     removeGameObject(object1);
                 }else if(object1 instanceof PlayerObject)
                 {
+                    player.eat(object);
                     removeGameObject(object);
                 }else {
                     processCollisions(object, object1);

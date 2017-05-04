@@ -3,7 +3,9 @@ import libs.Entry;
 import libs.RootMath;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Camera {
@@ -80,6 +82,27 @@ public class Camera {
         dr.enableDoubleBuffering();
 	}
 
+	private Color prcToRGB(int prc)
+    {
+        int percent = prc;
+        if (percent >= 100) {
+            percent = 99;
+        }
+
+        int r, g;
+        if (percent < 50) {
+            // green to yellow
+            r = 255 * (percent / 50);
+            g = 255;
+
+        } else {
+            // yellow to red
+            r = 255;
+            g = 255 * ((50 - percent % 50) / 50);
+        }
+        return new Color(r, g, 0);
+    }
+
 	private void showHUD()
     {
         dr.setPenColor(Color.black);
@@ -87,7 +110,7 @@ public class Camera {
 
         // orientation
         double ox = 50.0;
-        double oy = scaleY(90.0);
+        double oy = scaleY(95.0);
 
         double yaw = holder.getYaw() + Math.PI;
         double v = -holder.getVelocity().cartesian(1);
@@ -109,9 +132,20 @@ public class Camera {
         dr.point(ox, oy);
 
         dr.setPenColor(Color.BLACK);
-        dr.text(50.0, scaleY(85), "SpeedY: " +  String.format("%.0f", -v));
-        dr.text(65.0, scaleY(90), "SpeedX: " +  String.format("%.0f", -v1));
+        dr.text(50.0, scaleY(90), "SpeedY: " +  String.format("%.0f", -v));
+        dr.text(65.0, scaleY(95), "SpeedX: " +  String.format("%.0f", -v1));
 
+        dr.text(85, scaleY(84.5), "Fuel: ");
+
+        dr.setPenRadius(0.01);
+        int prc = (int) (holder.getScore() * (6.0 / 10.0));
+        //Color color = new Color((255 * (100 - prc)) / 100, (255 * (prc)) / 100 , 0);
+
+        Color color = prcToRGB(100 - holder.getScore());
+
+        drawRectangle(dr, color, 80.0, 83.0, prc, 3.0);
+        //Border
+        drawRectangle(dr, Color.BLACK, 80.0, 83.0, 60.0, 3.0, false);
     }
 
     private void drawTriangle(Draw dr, Color color,  double ox, double oy, double yaw) {
@@ -120,18 +154,59 @@ public class Camera {
         double width = Math.PI / 6.0;
 
         dr.setPenColor(color);
-        double[] x = new double[3];//Not the choice with stddraw so need to use array
-        double[] y = new double[3];
 
-        x[0] = ox + (Math.cos(yaw - width) * rayon);
-        y[0] = oy + (Math.sin(yaw - width) * rayon);
+        Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
 
-        x[1] = ox + (Math.cos(yaw + width) * rayon);
-        y[1] = oy + (Math.sin(yaw + width) * rayon);
+        points.add(new Entry<>(
+                ox + (Math.cos(yaw - width) * rayon),
+                oy + (Math.sin(yaw - width) * rayon)
+        ));
+        points.add(new Entry<>(
+                ox + (Math.cos(yaw + width) * rayon),
+                oy + (Math.sin(yaw + width) * rayon)
+        ));
 
-        x[2] = ox + (Math.cos(yaw) * (rayon + length));
-        y[2] = oy + (Math.sin(yaw) * (rayon + length));
-        dr.filledPolygon(x, y);
+        points.add(new Entry<>(
+                ox + (Math.cos(yaw) * (rayon + length)),
+                oy + (Math.sin(yaw) * (rayon + length))
+        ));
+
+        dr.filledPolygon(points);
+    }
+
+    private void drawRectangle(Draw dr, Color color, double ox, double oy, double width, double height)
+    {
+        drawRectangle(dr, color, ox, oy, width, height, true);
+    }
+
+    private void drawRectangle(Draw dr, Color color, double ox, double oy, double width, double height, boolean filled)
+    {
+        dr.setPenColor(color);
+
+        Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
+
+        points.add(new Entry<>(
+                ox,
+                scaleY(oy)
+        ));
+        points.add(new Entry<>(
+                ox - width,
+                scaleY(oy)
+        ));
+
+        points.add(new Entry<>(
+                ox - width,
+                scaleY(oy + height)
+        ));
+
+        points.add(new Entry<>(
+                ox,
+                scaleY(oy + height)
+        ));
+        if(filled)
+            dr.filledPolygon(points);
+        else
+            dr.polygon(points);
     }
 
     //Utils

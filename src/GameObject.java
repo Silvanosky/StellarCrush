@@ -14,9 +14,8 @@ public class GameObject {
     private double radius;
     private Color color;
 
-    //Physics
-    private Shape shape;
-    private double restCoeff; // Coefficient of restitution
+    //Point value of this object
+    private int points;
 
     static final double SIZE = 3E-14;
 
@@ -27,7 +26,9 @@ public class GameObject {
         this.mass = mass;
         this.radius = Math.sqrt((mass * radius) / Math.PI);
 
-        Random random = new Random();
+        updatePoint(GameObjectLibrary.ASTEROID_MAX_MASS);
+
+        Random random = GameObjectLibrary.getRandom();
         this.color = new Color(random.nextFloat(),
                 random.nextFloat(),
                 random.nextFloat());
@@ -77,6 +78,11 @@ public class GameObject {
         Vector position = object.getLocation();
         //Fast check distance
         return VectorUtil.distanceMinusTo(position, this.loc, (object.getRadius() + this.radius) * SIZE * StellarCrush.scale);
+    }
+
+    public void updatePoint(double max)
+    {
+        this.points = (int) ((mass / max) * 2);
     }
 
     public int getId() {
@@ -132,11 +138,11 @@ public class GameObject {
         this.color = color;
     }
 
-    public double getRestCoeff() {
-        return restCoeff;
+    public int getPoints() {
+        return points;
     }
 
-    public void setRestCoeff(double restCoeff) {
-        this.restCoeff = restCoeff;
+    public void setPoints(int points) {
+        this.points = points;
     }
 }

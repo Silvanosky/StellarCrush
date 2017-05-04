@@ -1,6 +1,10 @@
 import libs.Draw;
+import libs.Entry;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 public class PlayerObject extends GameObject implements IViewPort {
 
@@ -13,7 +17,7 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     private double yaw;
 
-    private int score = 0;
+    private int score = 20;
 
     public PlayerObject(Vector r, Vector v, double mass, double radius) {
         super(-1, r, v, mass, radius);
@@ -30,6 +34,23 @@ public class PlayerObject extends GameObject implements IViewPort {
         if(yaw < -Math.PI)
             nyaw += Math.PI * 2.0;
         return nyaw;
+    }
+
+    public void eat(GameObject object)
+    {
+        Vector position = object.getLocation();
+
+        double deltaX = (position.cartesian(0) - getLocation().cartesian(0)) / StellarCrush.scale;
+        double deltaY = (position.cartesian(1) - getLocation().cartesian(1)) / StellarCrush.scale;
+        double angle = clampYaw(Math.atan2(deltaY, deltaX) - yaw);
+
+        int point = object.getPoints();
+        if(Math.abs(angle) > Math.PI/2.0)
+            point *= -1;
+
+        score += point;
+        if(score >= 100) // TODO FINISH GAME
+            score = 100;
     }
 
     //@Override
@@ -71,19 +92,23 @@ public class PlayerObject extends GameObject implements IViewPort {
         double length = 0.018 * StellarCrush.scale;
         double width = Math.PI/12;
 
-        double[] x = new double[3];//Not the choice with stddraw so need to use array
-        double[] y = new double[3];
+        Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
 
-        x[0] = getLocation().cartesian(0) + (Math.cos(yaw - width) * rayon);
-        y[0] = getLocation().cartesian(1) + (Math.sin(yaw - width) * rayon);
+        points.add(new Entry<>(
+                getLocation().cartesian(0) + (Math.cos(yaw - width) * rayon),
+                getLocation().cartesian(1) + (Math.sin(yaw - width) * rayon)
+        ));
+        points.add(new Entry<>(
+                getLocation().cartesian(0) + (Math.cos(yaw + width) * rayon),
+                getLocation().cartesian(1) + (Math.sin(yaw + width) * rayon)
+        ));
 
-        x[1] = getLocation().cartesian(0) + (Math.cos(yaw + width) * rayon);
-        y[1] = getLocation().cartesian(1) + (Math.sin(yaw + width) * rayon);
+        points.add(new Entry<>(
+                getLocation().cartesian(0) + (Math.cos(yaw) * (rayon + length)),
+                getLocation().cartesian(1) + (Math.sin(yaw) * (rayon + length))
+        ));
 
-        x[2] = getLocation().cartesian(0) + (Math.cos(yaw) * (rayon + length));
-        y[2] = getLocation().cartesian(1) + (Math.sin(yaw) * (rayon + length));
-
-        dr.filledPolygon(x, y);
+        dr.filledPolygon(points);
 
         super.draw(dr);
     }

@@ -35,9 +35,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  *  <i>Draw</i>. This class provides a basic capability for
@@ -821,6 +819,26 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
     }
 
     /**
+     * Draws a polygon with the given (x[i], y[i]) coordinates.
+     *
+     * @param points a collection of all the x-y-coordinates of the polygon
+     */
+    public void polygon(Collection<Map.Entry<Double, Double>> points) {
+        Iterator<Map.Entry<Double, Double>> iterator = points.iterator();
+        GeneralPath path = new GeneralPath();
+        Map.Entry<Double, Double> first = iterator.next();
+        path.moveTo((float) scaleX(first.getKey()), (float) scaleY(first.getValue()));
+        while (iterator.hasNext())
+        {
+            Map.Entry<Double, Double> next = iterator.next();
+            path.lineTo((float) scaleX(next.getKey()), (float) scaleY(next.getValue()));
+        }
+        path.closePath();
+        offscreen.draw(path);
+        draw();
+    }
+
+    /**
      * Draws a filled polygon with the given (x[i], y[i]) coordinates.
      *
      * @param x an array of all the x-coordindates of the polygon
@@ -832,6 +850,26 @@ public final class Draw implements ActionListener, MouseListener, MouseMotionLis
         path.moveTo((float) scaleX(x[0]), (float) scaleY(y[0]));
         for (int i = 0; i < n; i++)
             path.lineTo((float) scaleX(x[i]), (float) scaleY(y[i]));
+        path.closePath();
+        offscreen.fill(path);
+        draw();
+    }
+
+    /**
+     * Draws a filled polygon with the given (x[i], y[i]) coordinates.
+     *
+     * @param points a collection of all the x-y-coordinates of the polygon
+     */
+    public void filledPolygon(Collection<Map.Entry<Double, Double>> points) {
+        Iterator<Map.Entry<Double, Double>> iterator = points.iterator();
+        GeneralPath path = new GeneralPath();
+        Map.Entry<Double, Double> first = iterator.next();
+        path.moveTo((float) scaleX(first.getKey()), (float) scaleY(first.getValue()));
+        while (iterator.hasNext())
+        {
+            Map.Entry<Double, Double> next = iterator.next();
+            path.lineTo((float) scaleX(next.getKey()), (float) scaleY(next.getValue()));
+        }
         path.closePath();
         offscreen.fill(path);
         draw();
