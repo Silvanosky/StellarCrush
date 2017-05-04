@@ -53,6 +53,11 @@ public class StellarCrush {
     //0: menu, 1: game, 2: game over; -1: stop all
     private static int state = 0;
 
+    private StellarCrush()
+    {
+
+    }
+
     public static void screen()
     {
         new File("screenshots").mkdir();
