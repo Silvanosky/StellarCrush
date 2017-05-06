@@ -58,7 +58,8 @@ public class Camera {
                 final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
                 renderer.add(new IEntry<>(() -> {
                     double radius =(GameObject.SIZE * obj.getRadius()) / dist;
-                    double posX = Math.sin(angle);
+                    //double posX = Math.sin(angle * Math.PI / FOV); // Non linear
+                    double posX = angle; // Non linear
                     double posY = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
                     dr.setPenColor(Color.RED);
                     dr.setPenRadius(radius * 1.01);
@@ -82,26 +83,19 @@ public class Camera {
         dr.enableDoubleBuffering();
 	}
 
-	private Color prcToRGB(int prc)
+	//Fade red to yellow to green
+	private Color prcToRGB(double prc)
     {
-        int percent = prc;
-        if (percent >= 100) {
-            percent = 99;
+        double x = prc;
+        if (x >= 100) {
+            x = 99.0;
         }
-
-        int r;
-        int g;
-        if (percent < 50) {
-            // green to yellow
-            r = 255 * (percent / 50);
-            g = 255;
-
-        } else {
-            // yellow to red
-            r = 255;
-            g = 255 * ((50 - percent % 50) / 50);
-        }
-        return new Color(r, g, 0);
+        if(x <= 1)
+            x = 1.0;
+        float red   = (float) (x > 50 ? 1 - 2 * (x - 50) / 100.0 : 1.0);
+        float green = (float) (x > 50 ? 1.0 : 2 * x / 100.0);
+        float blue  = 0.0f;
+        return new Color(red, green, blue);
     }
 
 	private void showHUD()
@@ -139,11 +133,9 @@ public class Camera {
         dr.text(85, scaleY(84.5), "Fuel: ");
 
         dr.setPenRadius(0.01);
-        int prc = (int) (holder.getScore() * (6.0 / 10.0));
-        //Color color = new Color((255 * (100 - prc)) / 100, (255 * (prc)) / 100 , 0);
+        Color color = prcToRGB(holder.getScore());
 
-        Color color = prcToRGB(100 - holder.getScore());
-
+        double prc = holder.getScore() * (6.0 / 10.0);
         drawRectangle(dr, color, 80.0, 83.0, prc, 3.0);
         //Border
         drawRectangle(dr, Color.BLACK, 80.0, 83.0, 60.0, 3.0, false);
@@ -212,6 +204,7 @@ public class Camera {
 
     //Utils
     private double  scaleX(double x) { return 100  * (x + FOV/2.0) / FOV; }
+    //private double  scaleX(double x) { return 100  * (x + 1.0) / 2.0; }
     private double  scaleY(double y) { return dr.getYmin() * y / 100; }
 
     private double clampYaw(double yaw)

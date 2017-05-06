@@ -14,5 +14,5 @@ public interface IViewPort {
 	double getYaw();
 	Color getColor();
 
-	int getScore();
+	double getScore();
 }

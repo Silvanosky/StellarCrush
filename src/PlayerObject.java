@@ -10,14 +10,17 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     private static final Color DEFAULT_COLOR = Draw.WHITE;
     private static final Color DEFAULT_FACING_COLOR = Draw.BLACK;
-    private static final double DEFAULT_FOV = Math.PI/2; // field of view of player's viewport
+    private static final double DEFAULT_FOV = Math.PI/2.0; // field of view of player's viewport
     private static final double FOV_INCREMENT = Math.PI/36; // rotation speed
+
+    private static final double USE_OF_FUEL_THRUST = 0.012;
+    private static final double USE_OF_FUEL_ROTATION = 0.008;
 
     private Camera cam;
 
     private double yaw;
 
-    private int score = 20;
+    private double score = 20;
 
     public PlayerObject(Vector r, Vector v, double mass, double radius) {
         super(-1, r, v, mass, radius);
@@ -50,6 +53,11 @@ public class PlayerObject extends GameObject implements IViewPort {
 
         score += point;
 
+        checkScore();
+    }
+
+    public void checkScore()
+    {
         //Game over
         if(score >= 100) {
             score = 100;
@@ -73,19 +81,29 @@ public class PlayerObject extends GameObject implements IViewPort {
                 if (StellarCrush.getListener().isUp())
                 {
                     setVelocity(getVelocity().plus(direction.times(100.0)));
+                    score -= USE_OF_FUEL_THRUST;
                 }
                 if (StellarCrush.getListener().isDown())
                 {
                     setVelocity(getVelocity().plus(direction.times(-100.0)));
+                    score -= USE_OF_FUEL_THRUST;
                 }
 
                 //Rotation
                 if (StellarCrush.getListener().isRight())
+                {
                     yaw -= FOV_INCREMENT;
+                    score -= USE_OF_FUEL_ROTATION;
+                }
                 if (StellarCrush.getListener().isLeft())
+                {
                     yaw += FOV_INCREMENT;
+                    score -= USE_OF_FUEL_ROTATION;
+                }
 
                 yaw = clampYaw(yaw);// -Pi -> Pi
+
+                checkScore();
             }
         }
     }
@@ -141,7 +159,7 @@ public class PlayerObject extends GameObject implements IViewPort {
     }
 
     @Override
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 

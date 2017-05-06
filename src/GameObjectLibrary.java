@@ -69,6 +69,11 @@ public class GameObjectLibrary {
 
     public static GameObject splitAsteroid(int id, GameObject gameObject)
     {
+
+        gameObject.setMass(gameObject.getMass()/2.0);
+        gameObject.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
+        gameObject.updatePoint();
+
         double angle = random.nextDouble() * Math.PI * 2.0;
         double radius = gameObject.getRadius();
         Vector vector = new Vector(new double[]{
@@ -78,15 +83,10 @@ public class GameObjectLibrary {
         GameObject cloned = new GameObject(id,
                 gameObject.getLocation().plus(vector),
                 gameObject.getVelocity(),
-                gameObject.getMass()/2.0,
+                gameObject.getMass(),
                 42.0);
-        cloned.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
+        cloned.setRadius(gameObject.getRadius());
         cloned.updatePoint();
-
-        gameObject.setMass(gameObject.getMass()/2.0);
-        gameObject.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
-        gameObject.updatePoint();
-
         cloned.setColor(gameObject.getColor());
 
         return cloned;
