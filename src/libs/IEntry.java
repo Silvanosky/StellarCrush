@@ -2,20 +2,6 @@ package libs;
 
 import java.util.Map;
 
-/**
- * ╱╲＿＿＿＿＿＿╱╲
- * ▏╭━━╮╭━━╮▕
- * ▏┃＿＿┃┃＿＿┃▕
- * ▏┃＿▉┃┃▉＿┃▕
- * ▏╰━━╯╰━━╯▕
- * ╲╰╰╯╲╱╰╯╯╱  Created by Silvanosky on 20/04/2017
- * ╱╰╯╰╯╰╯╰╯╲
- * ▏▕╰╯╰╯╰╯▏▕
- * ▏▕╯╰╯╰╯╰▏▕
- * ╲╱╲╯╰╯╰╱╲╱
- * ＿＿╱▕▔▔▏╲＿＿
- * ＿＿▔▔＿＿▔▔＿＿
- */
 public class IEntry<K, V> implements Map.Entry<K, V> {
 
     private final K key;

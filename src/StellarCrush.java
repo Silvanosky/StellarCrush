@@ -61,6 +61,9 @@ public class StellarCrush {
 
     }
 
+    /**
+     * Method to take a screenshot
+     */
     public static void screen()
     {
         pool.add(() -> {
@@ -69,6 +72,9 @@ public class StellarCrush {
         });
     }
 
+    /**
+     * Method to exec all waiting task on the queue
+     */
     private static void execPool()
     {
         while (!pool.isEmpty())
@@ -77,6 +83,9 @@ public class StellarCrush {
         }
     }
 
+    /**
+     * Method to draw the menu and wait to start
+     */
 	private static void menu()
 	{
         dr.setXscale(0.0, 100.0);
@@ -110,6 +119,10 @@ public class StellarCrush {
         }
 	}
 
+    /**
+     * Method to draw the game over screen
+     * @param win Has the player win or not (To change the message)
+     */
 	private static void gameOver(boolean win)
     {
         dr.setXscale(0.0, 100.0);
@@ -153,6 +166,10 @@ public class StellarCrush {
         return value;
     }
 
+    /**
+     * Utility method to create a Draw surface
+     * @return The new draw surface
+     */
     public static Draw createDraw()
     {
         Draw dr = new Draw(true);
@@ -160,6 +177,10 @@ public class StellarCrush {
         return dr;
     }
 
+    /**
+     * The main method
+     * @param args The arguments
+     */
 	public static void main(String[] args) {
 
         Rectangle screenSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();

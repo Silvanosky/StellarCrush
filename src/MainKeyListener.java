@@ -1,19 +1,5 @@
 import java.awt.event.KeyEvent;
 
-/**
- * ╱╲＿＿＿＿＿＿╱╲
- * ▏╭━━╮╭━━╮▕
- * ▏┃＿＿┃┃＿＿┃▕
- * ▏┃＿▉┃┃▉＿┃▕
- * ▏╰━━╯╰━━╯▕
- * ╲╰╰╯╲╱╰╯╯╱  Created by Silvanosky on 30/04/2017
- * ╱╰╯╰╯╰╯╰╯╲
- * ▏▕╰╯╰╯╰╯▏▕
- * ▏▕╯╰╯╰╯╰▏▕
- * ╲╱╲╯╰╯╰╱╲╱
- * ＿＿╱▕▔▔▏╲＿＿
- * ＿＿▔▔＿＿▔▔＿＿
- */
 public class MainKeyListener implements libs.DrawListener {
 
     private boolean up;

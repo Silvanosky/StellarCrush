@@ -34,12 +34,22 @@ public class GameObject {
                 random.nextFloat());
     }
 
+    /**
+     * Method used to move an object.
+     * @param f The vector force of the movement
+     * @param dt The duration of this movement
+     */
     public void move(Vector f, double dt) {
         Vector a = f.times(1/mass);
         this.velocity = this.velocity.plus(a.times(dt));
         this.loc = this.loc.plus(this.velocity.times(dt));
     }
 
+    /**
+     * Method wich compute the force between the current object and the specified object
+     * @param that The object to compare to
+     * @return The Vector force
+     */
     public Vector forceFrom(GameObject that) {
         Vector delta = that.loc.minus(this.loc);
         double dist = delta.dot(delta) + StellarCrush.softE * StellarCrush.softE;
@@ -49,13 +59,20 @@ public class GameObject {
         //return delta.direction().times(f);
     }
 
+    /**
+     * Method to draw the object on a surface.
+     * @param dr The surface to draw on
+     */
     public void draw(Draw dr) {
         dr.setPenColor(this.color);
         double v = SIZE * this.radius * StellarCrush.scale;
         dr.filledCircle(this.loc.cartesian(0), this.loc.cartesian(1), v);
     }
 
-    //Nonelastic collisions
+    /**
+     * Method wich compute and apply the collision force to the objects
+     * @param object The object to collide with
+     */
     public void applyCollide(GameObject object)
     {
         Vector ua = this.velocity;
@@ -73,6 +90,11 @@ public class GameObject {
 
     }
 
+    /**
+     * Method to check if the object collide with the current object
+     * @param object The object to check the collision.
+     * @return If collide or not
+     */
     public boolean collideWith(GameObject object)
     {
         Vector position = object.getLocation();
@@ -80,6 +102,9 @@ public class GameObject {
         return VectorUtil.distanceMinusTo(position, this.loc, (object.getRadius() + this.radius) * SIZE * StellarCrush.scale);
     }
 
+    /**
+     * Method to update the amount of point depending on the mass.
+     */
     public void updatePoint()
     {
         //Math.log(GameObjectLibrary.ASTEROID_MIN_MASS) = 22

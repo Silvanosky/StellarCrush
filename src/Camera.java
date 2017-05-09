@@ -34,6 +34,10 @@ public class Camera {
         dr.toFocus();
     }
 
+    /**
+     * Method wich render a frame on the first person view, with the specified objects
+     * @param objects The collection of objects to draw
+     */
 	void render(Collection<GameObject> objects) {
         dr.clear();
         //drawGrid();
@@ -82,7 +86,11 @@ public class Camera {
         dr.enableDoubleBuffering();
 	}
 
-	//Fade red to yellow to green
+    /**
+     * Method which compute the color depending on the percentage
+     * @param prc The percentage
+     * @return The color corresponding
+     */
 	private Color prcToRGB(double prc)
     {
         double x = prc;
@@ -169,7 +177,10 @@ public class Camera {
         return new Vector(new double[]{bx, by});
     }
 
-	private void showHUD()
+    /**
+     * Method wich draw the HUD on the first player view
+     */
+    private void showHUD()
     {
         dr.setPenColor(Color.black);
         dr.text(90, scaleY(99), "FPS: " + StellarCrush.getFPS());
@@ -212,6 +223,14 @@ public class Camera {
         drawRectangle(dr, Color.BLACK, 80.0, 83.0, 60.0, 3.0, false);
     }
 
+    /**
+     * Utility method wich draw a triangle
+     * @param dr The surface
+     * @param color The color of the triangle
+     * @param ox The origin x
+     * @param oy The origin y
+     * @param yaw The orientation
+     */
     private void drawTriangle(Draw dr, Color color,  double ox, double oy, double yaw) {
         double rayon = 3.0;
         double length = 2.0;
@@ -238,11 +257,30 @@ public class Camera {
         dr.filledPolygon(points);
     }
 
+    /**
+     * Utility method wich draw a filled rectangle
+     * @param dr the surface to draw
+     * @param color the color
+     * @param ox the origin x
+     * @param oy the origin y
+     * @param width the width
+     * @param height the height
+     */
     private void drawRectangle(Draw dr, Color color, double ox, double oy, double width, double height)
     {
         drawRectangle(dr, color, ox, oy, width, height, true);
     }
 
+    /**
+     * Utility method wich draw a rectangle
+     * @param dr the surface
+     * @param color the color
+     * @param ox the origin x
+     * @param oy the origin y
+     * @param width the width
+     * @param height the height
+     * @param filled is the rectangle filled or not
+     */
     private void drawRectangle(Draw dr, Color color, double ox, double oy, double width, double height, boolean filled)
     {
         dr.setPenColor(color);
@@ -275,7 +313,6 @@ public class Camera {
 
     //Utils
     private double  scaleX(double x) { return 100  * (x + FOV/2.0) / FOV; }
-    //private double  scaleX(double x) { return 100  * (x + 1.0) / 2.0; }
     private double  scaleY(double y) { return dr.getYmin() * y / 100; }
 
     /**

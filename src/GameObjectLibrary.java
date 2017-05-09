@@ -13,18 +13,27 @@ public class GameObjectLibrary {
 
     private static final double SQUARE_OF_TWO = Math.sqrt(2.0);
 
-    private static final Random random = new Random(0);//seed = 0 for test
+    private static final Random random = new Random();//seed = 0 for test
 
     private GameObjectLibrary()
     {
 
     }
 
+    /**
+     * Method wich create a player
+     * @return The playerobject
+     */
     public static PlayerObject createPlayerObject()
     {
         return new PlayerObject(new Vector(2), new Vector(2), PLAYER_MASS, 0.05);
     }
 
+    /**
+     * Method wich create an asteroid on the circle
+     * @param id The id of the object
+     * @return The new gameobject
+     */
     public static GameObject createAsteroidCircle(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
@@ -39,6 +48,11 @@ public class GameObjectLibrary {
         return new GameObject(id, r, v, mass, radius);
     }
 
+    /**
+     * Method wich create and asteroid outside of the window with a big velocity to the center
+     * @param id The id of the object
+     * @return The new gameobject
+     */
     public static GameObject createBulletAsteroid(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
@@ -54,6 +68,11 @@ public class GameObjectLibrary {
         return new GameObject(id, r, v, mass, radius);
     }
 
+    /**
+     * Create a random asteroid on the world, For test purpose
+     * @param id The id of the object
+     * @return The new object
+     */
     public static GameObject createAsteroidRandom(int id)
     {
         double mass = ASTEROID_MIN_MASS + random.nextDouble() * (ASTEROID_MAX_MASS - ASTEROID_MIN_MASS);
@@ -67,6 +86,12 @@ public class GameObjectLibrary {
         return new GameObject(id, r, v, mass, radius);
     }
 
+    /**
+     * Utility method to split an asteroid
+     * @param id The id of the new object
+     * @param gameObject the object to split
+     * @return the new object of the split
+     */
     public static GameObject splitAsteroid(int id, GameObject gameObject)
     {
         gameObject.setMass(gameObject.getMass()/2.0);
@@ -76,8 +101,8 @@ public class GameObjectLibrary {
         double angle = random.nextDouble() * Math.PI * 2.0;
         double radius = gameObject.getRadius();
         Vector vector = new Vector(new double[]{
-                Math.cos(angle) * (radius*2.0) * GameObject.SIZE * StellarCrush.scale,
-                Math.sin(angle) * (radius*2.0) * GameObject.SIZE * StellarCrush.scale});
+                Math.cos(angle) * (radius*2.2) * GameObject.SIZE * StellarCrush.scale,
+                Math.sin(angle) * (radius*2.2) * GameObject.SIZE * StellarCrush.scale});
 
         GameObject cloned = new GameObject(id,
                 gameObject.getLocation().plus(vector),
@@ -91,6 +116,11 @@ public class GameObjectLibrary {
         return cloned;
     }
 
+    /**
+     * Utility method to merge an asteroid, the second go in the first
+     * @param a The asteroid to merge which will receive all
+     * @param b The asteroid to merge and then destroy
+     */
     public static void mergeAsteroid(GameObject a, GameObject b)
     {
         a.setMass(a.getMass() + b.getMass());
