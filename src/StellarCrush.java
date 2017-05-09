@@ -34,13 +34,14 @@ import libs.Draw;
 
 import java.awt.*;
 import java.io.File;
+import java.util.PriorityQueue;
 
 public class StellarCrush {
 	// Main game class
 
 	// CONSTANTS TUNED FOR GAMEPLAY EXPERIENCE
-	static final int GAME_DELAY_TIME = 5000; // in-game time units between frame updates
-	static final int TIME_PER_MS = 1000; // how long in-game time corresponds to a real-time millisecond
+	private static final int GAME_DELAY_TIME = 5000; // in-game time units between frame updates
+	private static final int TIME_PER_MS = 1000; // how long in-game time corresponds to a real-time millisecond
 	static final double G = 6.67e-11; // gravitational constant
 	static final double softE = 0.001; // softening factor to avoid division by zero calculating force for co-located objects
 	static final double scale = 5e10; // plotted universe size
@@ -53,6 +54,8 @@ public class StellarCrush {
     //0: menu, 1: game, 2: game over; -1: stop all
     private static int state = 0;
 
+    private static PriorityQueue<Runnable> pool = new PriorityQueue<>();
+
     private StellarCrush()
     {
 
@@ -60,8 +63,18 @@ public class StellarCrush {
 
     public static void screen()
     {
-        new File("screenshots").mkdir();
-        dr.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
+        pool.add(() -> {
+            new File("screenshots").mkdir();
+            dr.save("screenshots/" + Long.toString(System.currentTimeMillis()) + ".png");
+        });
+    }
+
+    private static void execPool()
+    {
+        while (!pool.isEmpty())
+        {
+            pool.poll().run();
+        }
     }
 
 	private static void menu()
@@ -87,6 +100,7 @@ public class StellarCrush {
 
 		try{
             while(state == 0) {
+                execPool();
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
@@ -122,6 +136,7 @@ public class StellarCrush {
 
         try{
             while(state == 2) {
+                execPool();
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
@@ -170,12 +185,15 @@ public class StellarCrush {
             {
                 long currentTime = System.currentTimeMillis();
                 dr.clear();
-                gameState.update((int) (GAME_DELAY_TIME + (currentTime - lastFrame) * TIME_PER_MS));
+                int delay = (int) ((currentTime - lastFrame) * TIME_PER_MS);
+                //System.out.println("delay: " + delay);
+                gameState.update(delay);
                 gameState.draw();
                 dr.show();
+                execPool();
                 try {
                     //Sleep for the next frame
-                    Thread.sleep(clamp((GAME_DELAY_TIME - (currentTime - lastFrame) * TIME_PER_MS) / TIME_PER_MS));
+                    Thread.sleep(GAME_DELAY_TIME  / TIME_PER_MS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     //Interrupted so return
@@ -190,7 +208,7 @@ public class StellarCrush {
                     frame = 0;
                     time = System.currentTimeMillis();
                 }
-                lastFrame = System.currentTimeMillis();
+                lastFrame = currentTime;
             }
             gameState.close();
             dr.closeWindow();

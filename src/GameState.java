@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 public class GameState {
     // Class representing the game state and implementing main game loop update step.t
 
-    static final double SPLIT_SPEED_MIN = 11000;
-    static final double MERGE_SPEED_MAX = 0.013;
-    static final double MAX_ASTEROID_NUMBER = 500;
+    private static final double SPLIT_SPEED_MIN = 11000;
+    private static final double MERGE_SPEED_MAX = 0.013;
+    private static final double MAX_ASTEROID_NUMBER = 500;
 
-    static final long TIME_PER_SPAWN = 1 * 1000;
+    private static final long TIME_PER_SPAWN = 1000;
 
     private final Collection<GameObject> objects;
     private final PlayerObject player;
@@ -24,17 +24,21 @@ public class GameState {
 
     private long lastSpawnedAsteroid;
 
-    private final Draw StdDraw = StellarCrush.getDraw();
-
+    /**
+     * Create an game instance
+     * @param player The game player instance
+     * @param radius The radius of this game
+     */
     GameState(PlayerObject player, double radius) {
         this.player = player;
-        double ratio = (double) StdDraw.getWidth() / StdDraw.getHeight();
-        StdDraw.setXscale(-radius, +radius);
-        StdDraw.setYscale(-radius / ratio, +radius / ratio);
+        Draw draw = StellarCrush.getDraw();
+        double ratio = (double) draw.getWidth() / draw.getHeight();
+        draw.setXscale(-radius, +radius);
+        draw.setYscale(-radius / ratio, +radius / ratio);
 
-        StdDraw.changeWindowTitle("StellarCrush");
+        draw.changeWindowTitle("StellarCrush");
 
-        this.objects = new LinkedList<>();
+        this.objects = new HashSet<>();
 
         for (int i = 0; i < 150; i++)
         {
@@ -47,16 +51,28 @@ public class GameState {
 
     }
 
+    /**
+     * Add an object to the game world
+     * @param object The object to add
+     */
     private synchronized void addGameObject(GameObject object)
     {
         this.objects.add(object);
     }
 
+    /**
+     * Remove and object from the game world
+     * @param object The object to remove
+     */
     private synchronized void removeGameObject(GameObject object)
     {
         this.objects.remove(object);
     }
 
+    /**
+     * Utility method which check if some objects collides and merge then in that case.
+     * @return The number of object that was merged during this check.
+     */
     private int checkIntegrity()
     {
         ExecutorService taskExecutor = Executors.newWorkStealingPool();
@@ -85,6 +101,10 @@ public class GameState {
         return i;
     }
 
+    /**
+     * The main game loop method. This method update the game for the desired delay.
+     * @param delay The delay to add to the game
+     */
     synchronized void update(int delay) {
         //Input
         this.player.processCommand(delay);
@@ -113,7 +133,7 @@ public class GameState {
 
             for(GameObject object1 : collides)
             {
-                collisions.get(object1).remove(object);
+                //collisions.get(object1).remove(object);
 
                 object.applyCollide(object1);
                 if(object instanceof PlayerObject)
@@ -130,14 +150,17 @@ public class GameState {
             }
         }
         //Check in bounds
-        /*for(GameObject object : objects)
-            checkPosition(object);*/
         checkPosition(player);
 
         processGamePlay();
     }
 
-    //Process merge or split depending on environment
+    /**
+     * Utility method called just after a collision between 2 objects.
+     * This method determine depending on the collision if we need to split or merge the object or do nothing.
+     * @param object The first object colliding.
+     * @param object1 The second object colliding.
+     */
     private void processCollisions(GameObject object, GameObject object1)
     {
         if(VectorUtil.distanceMinusTo(object.getVelocity(), object1.getVelocity(), MERGE_SPEED_MAX)
@@ -157,7 +180,11 @@ public class GameState {
         }
     }
 
-    //Check position of an object and bounce him if out
+    /**
+     * Method that check if an object is in the border and if not revert the velocity to make it come back.
+     * Used to keep the player in the playing window.
+     * @param object The object to do the check.
+     */
     private void checkPosition(GameObject object)
     {
         Vector position = object.getLocation();
@@ -193,7 +220,9 @@ public class GameState {
         }
     }
 
-    //Gameplay
+    /**
+     * Method called at the end of each frame to apply gameplay feature like asteroid spawn.
+     */
     private void processGamePlay()
     {
         if(System.currentTimeMillis() - lastSpawnedAsteroid > TIME_PER_SPAWN)
@@ -206,6 +235,13 @@ public class GameState {
         }
     }
 
+    /**
+     * Compute all the force occurring on the objects and return it.
+     * The compute is multi-threaded using the current pool given in parameter.
+     *
+     * @param taskExecutor The pool of thread to compute the result.
+     * @return Map of GameObject and Vector corresponding to the force for each object.
+     */
     private Map<GameObject,Vector> calculateForces(ExecutorService taskExecutor) {
 
         Map<GameObject, Vector> map = new ConcurrentHashMap<>();
@@ -227,7 +263,13 @@ public class GameState {
         return map;
     }
 
-
+    /**
+     * Compute all the force occurring on the objects and return it.
+     * The compute is multi-threaded using the current pool given in parameter.
+     *
+     * @param taskExecutor The pool of thread to compute the result.
+     * @return Map of GameObject and Vector corresponding to the objects colliding.
+     */
     private Map<GameObject, Collection<GameObject>> calculateCollisions(ExecutorService taskExecutor)
     {
         Map<GameObject, Collection<GameObject>> map = new ConcurrentHashMap<>();
@@ -242,18 +284,22 @@ public class GameState {
             for(GameObject object1 : objects)
             {
                 taskExecutor.execute(() -> {
-                    if(object1.getId() == object.getId()
+                    if(object1.getId() <= object.getId()
                             || !object.collideWith(object1))
                         return;
 
                     map.get(object).add(object1);
-                    map.get(object1).add(object);
+                    //map.get(object1).add(object);
                 });
             }
         }
         return map;
     }
 
+    /**
+     * Method used to draw all the object on the main window.
+     * This method also refresh the First person view.
+     */
     synchronized void draw() {
         for (GameObject object : this.objects)
             object.draw(StellarCrush.getDraw());
@@ -261,11 +307,19 @@ public class GameState {
         new Thread(() -> player.getCam().render(objects)).start();
     }
 
-    public PlayerObject getPlayer() {
-        return player;
+    /**
+     * Method to cleanup before deletion
+     */
+    public void close()
+    {
+        player.close();
     }
 
-    public void close() {
-        player.close();
+    /**
+     * Get the player of the game.
+     * @return Instance of PlayerObject.
+     */
+    public PlayerObject getPlayer() {
+        return player;
     }
 }

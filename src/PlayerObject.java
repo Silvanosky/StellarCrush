@@ -2,8 +2,8 @@ import libs.Draw;
 import libs.IEntry;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 public class PlayerObject extends GameObject implements IViewPort {
@@ -19,16 +19,30 @@ public class PlayerObject extends GameObject implements IViewPort {
     private Camera cam;
 
     private double yaw;
+    private Vector facingVector;
 
     private double score = 20;
 
+    /**
+     * Create a player instance
+     * @param r The position of the player
+     * @param v The starting velocity of the player
+     * @param mass The mass for the player
+     * @param radius The radius
+     */
     public PlayerObject(Vector r, Vector v, double mass, double radius) {
         super(-1, r, v, mass, radius);
+        updateFacingVector();
 
         this.cam = new Camera(this, DEFAULT_FOV);
         this.yaw = 0;
     }
 
+    /**
+     * Method which clamp and angle to stay in the good rand [-PI, PI]
+     * @param yaw The angle to clamp
+     * @return The clamped angle
+     */
     private double clampYaw(double yaw)
     {
         double nyaw = yaw;
@@ -39,6 +53,11 @@ public class PlayerObject extends GameObject implements IViewPort {
         return nyaw;
     }
 
+    /**
+     * Method called when the player eat an object.
+     * This method determine of the player gain or loose point depending on the situation.
+     * @param object The object to be ate by the player.
+     */
     public void eat(GameObject object)
     {
         Vector position = object.getLocation();
@@ -54,8 +73,22 @@ public class PlayerObject extends GameObject implements IViewPort {
         score += point;
 
         checkScore();
+
     }
 
+    /**
+     * Method to update the saved facing vector corresponding to angle.
+     * This avoid to recompute the sin and cos of the angle each time we need it.
+     * Also we update it any time we change the yaw.
+     */
+    private void updateFacingVector()
+    {
+        this.facingVector = new Vector(new double[]{Math.cos(yaw), Math.sin(yaw)});
+    }
+
+    /**
+     * Method that check if the game is over depending on the current score.
+     */
     public void checkScore()
     {
         //Game over
@@ -69,7 +102,11 @@ public class PlayerObject extends GameObject implements IViewPort {
         }
     }
 
-    //@Override
+    /**
+     * Utility method which handle the Input for the player.
+     * This method handle the thrust and rotation.
+     * @param delay The delay to apply to the input (not used)
+     */
     void processCommand(int delay) {
         // Process keys applying to the player
 		// Retrieve 
@@ -94,20 +131,28 @@ public class PlayerObject extends GameObject implements IViewPort {
                 {
                     yaw -= FOV_INCREMENT;
                     score -= USE_OF_FUEL_ROTATION;
+
+                    yaw = clampYaw(yaw);// -Pi -> Pi
+                    updateFacingVector();
                 }
                 if (StellarCrush.getListener().isLeft())
                 {
                     yaw += FOV_INCREMENT;
                     score -= USE_OF_FUEL_ROTATION;
-                }
 
-                yaw = clampYaw(yaw);// -Pi -> Pi
+                    yaw = clampYaw(yaw);// -Pi -> Pi
+                    updateFacingVector();
+                }
 
                 checkScore();
             }
         }
     }
 
+    /**
+     * Draw the object on the main screen.
+     * @param dr The screen to draw
+     */
     @Override
     public void draw(Draw dr)
     {
@@ -118,7 +163,7 @@ public class PlayerObject extends GameObject implements IViewPort {
         double length = 0.018 * StellarCrush.scale;
         double width = Math.PI/12;
 
-        Collection<Map.Entry<Double, Double>> points = new ArrayList<>();
+        Collection<Map.Entry<Double, Double>> points = new HashSet<>();
 
         points.add(new IEntry<>(
                 getLocation().cartesian(0) + (Math.cos(yaw - width) * rayon),
@@ -145,7 +190,7 @@ public class PlayerObject extends GameObject implements IViewPort {
 
     @Override
     public Vector getFacingVector() {
-        return new Vector(new double[]{Math.cos(yaw), Math.sin(yaw)});
+        return facingVector;
     }
 
     @Override
@@ -168,6 +213,9 @@ public class PlayerObject extends GameObject implements IViewPort {
         score += value;
     }
 
+    /**
+     * The method to close all the needed stuff.
+     */
     public void close() {
         cam.close();
         cam = null;

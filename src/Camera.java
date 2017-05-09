@@ -3,10 +3,7 @@ import libs.IEntry;
 import libs.RootMath;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Camera {
     // Virtual camera - uses a plane one unit away from the focal point
@@ -39,9 +36,11 @@ public class Camera {
 
 	void render(Collection<GameObject> objects) {
         dr.clear();
+        //drawGrid();
 
         //Use this queue to first
-        PriorityQueue<IEntry<Runnable, Double>> renderer = new PriorityQueue<>((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
+        PriorityQueue<IEntry<Runnable, Double>> renderer =
+                new PriorityQueue<>((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
 
         for(GameObject obj : objects) {
             if(holder.getId() == obj.getId())
@@ -57,12 +56,12 @@ public class Camera {
             if (Math.abs(angle) < FOV/2.0 + Math.PI / 12.0) { // Don't compute out of range objects
                 final double dist = RootMath.sqrtApprox((float) (deltaX * deltaX + deltaY * deltaY)) ;
                 renderer.add(new IEntry<>(() -> {
-                    double radius =(GameObject.SIZE * obj.getRadius()) / dist;
+                    double radius = (GameObject.SIZE * obj.getRadius()) / dist;
                     //double posX = Math.sin(angle * Math.PI / FOV); // Non linear
                     double posX = angle; // Non linear
                     double posY = Math.abs(dr.getYmax() - dr.getYmin())/2.0;
                     dr.setPenColor(Color.RED);
-                    dr.setPenRadius(radius * 1.01);
+                    dr.setPenRadius(radius * 1.02);
                     dr.point(scaleX(posX), posY);
 
                     dr.setPenColor(obj.getColor());
@@ -96,6 +95,78 @@ public class Camera {
         float green = (float) (x > 50 ? 1.0 : 2 * x / 100.0);
         float blue  = 0.0f;
         return new Color(red, green, blue);
+    }
+
+    private void drawGrid()
+    {
+        int nLine = 10;
+        double gap = (2.0 * StellarCrush.scale) / nLine;
+
+        double cx = holder.getLocation().cartesian(0);
+        double cy = holder.getLocation().cartesian(1);
+        double cz = StellarCrush.scale / 6.0;
+
+        for(int i = -nLine/2; i <= nLine/2; i++)
+        {
+            Vector p1 = get3DProjection(i * gap, -StellarCrush.scale, 0.0,
+                    cx, cy, cz);
+            Vector p2 = get3DProjection(i * gap, StellarCrush.scale, 0.0,
+                    cx, cy, cz);
+            drawLine(p1, p2);
+        }
+
+        for(int i = -nLine/2; i <= nLine/2; i++)
+        {
+            Vector p1 = get3DProjection(-StellarCrush.scale,i * gap, 0.0,
+                    cx, cy, cz);
+            Vector p2 = get3DProjection(StellarCrush.scale, i * gap, 0.0,
+                    cx, cy, cz);
+            drawLine(p1, p2);
+        }
+
+    }
+
+    private  void drawLine(Vector p1, Vector p2)
+    {
+        p1 = p1.times(10);
+        p2 = p2.times(10);
+        dr.setPenRadius(0.001);
+        dr.setPenColor(Color.BLACK);
+        dr.line(p1.cartesian(0)+50.0,
+                p1.cartesian(1)+50.0,
+                p2.cartesian(0)+50.0,
+                p2.cartesian(1)+50.0);
+    }
+
+    private Vector get3DProjection(double ax, double ay, double az,
+                                   double cax, double cay, double caz)
+    {
+        double x = ax - cax;
+        double y = ay - cay;
+        double z = az - caz;
+
+        double anx = Math.cos(holder.getYaw()) * Math.cos(Math.PI / 4);
+        double any = Math.sin(holder.getYaw()) * Math.cos(Math.PI / 4);
+        double anz = Math.sin(Math.PI / 4);
+
+        double sx = Math.sin(anx);
+        double sy = Math.sin(any);
+        double sz = Math.sin(anz);
+
+        double cx = Math.cos(anx);
+        double cy = Math.cos(any);
+        double cz = Math.cos(anz);
+
+        double ez = 1.0/Math.tan(FOV/2.0);
+
+        double dx = cy * (sz * y + cz * x) - sy * z;
+        double dy = sx * (cy * z + sy * (sz * y + cz * x)) + cx * (cz * y - sz * x);
+        double dz = cx * (cy * z + sy * (sz * y + cz * x)) - sx * (cz * y - sz * x);
+
+        double bx = ez * dx / dz;
+        double by = ez * dy / dz;
+
+        return new Vector(new double[]{bx, by});
     }
 
 	private void showHUD()
@@ -207,6 +278,11 @@ public class Camera {
     //private double  scaleX(double x) { return 100  * (x + 1.0) / 2.0; }
     private double  scaleY(double y) { return dr.getYmin() * y / 100; }
 
+    /**
+     * Method which clamp and angle to stay in the good rand [-PI, PI]
+     * @param yaw The angle to clamp
+     * @return The clamped angle
+     */
     private double clampYaw(double yaw)
     {
         double nam = yaw;

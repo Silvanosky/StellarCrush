@@ -7,13 +7,13 @@ public class GameObjectLibrary {
     // UNIVERSE CONSTANTS - TUNED BY HAND FOR RANDOM GENERATION
     private static final double ASTEROID_RADIUS = 0.5; // Location of asteroid belt for random initialization
     private static final double ASTEROID_WIDTH = 0.2; // Width of asteroid belt
-    static final double ASTEROID_MIN_MASS = 1E22;
-    static final double ASTEROID_MAX_MASS = 1E24;
+    public static final double ASTEROID_MIN_MASS = 1E22;
+    private static final double ASTEROID_MAX_MASS = 1E24;
     private static final double PLAYER_MASS = 1E26;
 
     private static final double SQUARE_OF_TWO = Math.sqrt(2.0);
 
-    private static final Random random = new Random(0);
+    private static final Random random = new Random(0);//seed = 0 for test
 
     private GameObjectLibrary()
     {
@@ -69,7 +69,6 @@ public class GameObjectLibrary {
 
     public static GameObject splitAsteroid(int id, GameObject gameObject)
     {
-
         gameObject.setMass(gameObject.getMass()/2.0);
         gameObject.setRadius(gameObject.getRadius()/SQUARE_OF_TWO);
         gameObject.updatePoint();

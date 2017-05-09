@@ -6,8 +6,9 @@ public class VectorUtil {
     public static final Vector TWO_D_ZERO = new Vector(new double[]{0, 0});
 
     static Vector rotate(Vector v, double ang) {
-        // Rotate v by ang radians - two dimensions only.
-        return null;
+        double x = v.cartesian(0) * Math.cos(ang) - (v.cartesian(1) * Math.sin(ang));
+        double y = v.cartesian(0) * Math.sin(ang) + (v.cartesian(1) * Math.cos(ang));
+        return new Vector(new double[]{x, y});
     }
 
     static Vector direction(Vector v) {
